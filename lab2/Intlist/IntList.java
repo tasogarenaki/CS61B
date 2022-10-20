@@ -120,7 +120,7 @@ public class IntList {
             ptr = ptr.rest;
             temp = temp.rest;
         }
-        return res;
+        return dcatenate(res, B);
     }
 
 
