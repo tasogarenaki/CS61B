@@ -4,30 +4,29 @@
  * Representation of a planet, its position, velocity, and mass.
  * @author TC
  */
-
 public class Planet {
 
-    /* current x and y position */
+    /* Current x and y position. */
     public double xxPos;
     public double yyPos;
 
-    /* current velocity in the x and y direction */
+    /* Current velocity in the x and y direction. */
     public double xxVel;
     public double yyVel;
 
-    /* mass */
+    /* Mass */
     public double mass;
 
-    /* name of the file that corresponds to the image that depicts the planet */
+    /* Name of the file that corresponds to the image that depicts the planet. */
     public String imgFileName;
 
     /**
-     * the gravitational constant G, cannot invoke by outside of class
-     * declare any constants as a `static final` variable
+     * The gravitational constant G, cannot invoke by outside of class
+     * declare any constants as a `static final` variable.
      * */
     private static final double G = 6.67e-11;
 
-    /* initialize an instance of the Planet class */
+    /* Initialize an instance of the Planet class. */
     public Planet(double xP, double yP, double xV, double yV, double m, String img) {
         xxPos = xP;
         yyPos = yP;
@@ -37,7 +36,7 @@ public class Planet {
         imgFileName = img;
     }
 
-    /* take in a Planet object and initialize an identical Planet object (copy) */
+    /* Take in a Planet object and initialize an identical Planet object (copy). */
     public Planet(Planet p) {
         xxPos = p.xxPos;
         yyPos = p.yyPos;
@@ -48,7 +47,7 @@ public class Planet {
     }
 
     /**
-     * calculate the distance between two plants
+     * Calculate the distance between two plants.
      * @param   p    the other planet
      * @return       distance between plant p and this planet
      */
@@ -59,7 +58,7 @@ public class Planet {
     }
 
     /**
-     * calculate the force exerted on this planet by another planet
+     * Calculate the force exerted on this planet by another planet.
      * @param   p     the planet whose force is exerted on this planet
      * @return        the force exerted on this planet by planet p
      */
@@ -69,7 +68,7 @@ public class Planet {
     }
 
     /**
-     * calculate the force exerted in the x direction
+     * Calculate the force exerted in the x direction.
      * @param   p      the planet whose force is exerted on this planet
      * @return         the force exerted on this planet by planet p in x direction
      */
@@ -81,7 +80,7 @@ public class Planet {
     }
 
     /**
-     * calculate the force exerted in the y direction
+     * Calculate the force exerted in the y direction.
      * @param   p      the planet whose force is exerted on this planet
      * @return         the force exerted on this planet by planet p in y direction
      */
@@ -93,7 +92,7 @@ public class Planet {
     }
 
     /**
-     * calculate the net force exerted in the x direction
+     * Calculate the net force exerted in the x direction.
      * @param   allPlanets  array of planets
      * @return              the net x force exerted by all planes
      *
@@ -101,7 +100,7 @@ public class Planet {
     public double calcNetForceExertedByX(Planet[] allPlanets) {
         double netFx = 0;
         for (Planet p : allPlanets) {
-            // planets cannot exert gravitational forces on themselves
+            /* Planets cannot exert gravitational forces on themselves. */
             if (p == this) continue;
             netFx += calcForceExertedByX(p);
         }
@@ -109,7 +108,7 @@ public class Planet {
     }
 
     /**
-     * calculate the net force exerted in the y direction
+     * Calculate the net force exerted in the y direction.
      * @param   allPlanets  array of planets
      * @return              the net y force exerted by all planes
      *
@@ -124,7 +123,7 @@ public class Planet {
     }
 
     /**
-     * calculates and updates the change in velocity and position,
+     * Calculates and updates the change in velocity and position,
      * based on the net exerted force on this planet.
      * @param   dt  the increment of time used for calc. the change in velocity
      * @param   fx  net force exerted on this planet in x direction
@@ -137,6 +136,13 @@ public class Planet {
         yyVel += ay * dt;
         xxPos += xxVel * dt;
         yyPos += yyVel * dt;
+    }
+
+    /**
+     * Draws a planet at its current position.
+     */
+    public void draw() {
+        StdDraw.picture(xxPos, yyPos, "images/" + imgFileName);
     }
 
 }
