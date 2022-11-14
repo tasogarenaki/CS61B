@@ -51,6 +51,15 @@ public class LinkedListDeque<T> {
         firstNode.prev = sentinel;
 
         size += 1;
+
+        /** Version 2 */
+        /* 1) Creates a Node with (item, prev, next) with f.prev -> s and f.next -> s.next */
+        // Node firstNode = new Node(item, sentinel, sentinel.next);
+        /* 2) s.next.prev -> f  */
+        // sentinel.next.prev = firstNode;
+        /* 3) new s.next -> f */
+        // sentinel.next = firstNode;
+        // size += 1;
     }
 
     /**
@@ -74,37 +83,41 @@ public class LinkedListDeque<T> {
      * @return ture if deque is empty, false otherwise
      */
     public boolean isEmpty() {
-
+        return size == 0;
     }
 
     /**
      * @return the number of items in the deque.
      */
     public int size() {
-
+        return size;
     }
 
     /**
      * Prints the items in the deque from first to last, separated by a space.
      */
     public void printDeque() {
-
+        for (Node<T> ptr = sentinel.next; ptr != sentinel; ptr = ptr.next) {
+            System.out.print(ptr.item + " ");
+        }
     }
 
     /**
      * Removes and returns the item at the front of the deque.
+     * Uses helper function remove() with input sentinel.next
      * @return the first item in the deque, if no such item exists, returns null.
      */
     public T removeFirst() {
-
+        return remove(sentinel.next);
     }
 
     /**
      * Removes and returns the item at the back of the deque.
+     * Uses helper function with input sentinel.prev
      * @return the last item in the deque, if no such item exists, returns null.
      */
     public T removeLast() {
-
+        return remove(sentinel.prev);
     }
 
     /**
@@ -113,20 +126,57 @@ public class LinkedListDeque<T> {
      * @return      the item at the given index, or null if no such item exists
      */
     public T get(int index) {
+        Node<T> ptr = sentinel.next;
 
+        for (int i = 0; i != index; i++) {
+            ptr = ptr.next;
+        }
+
+        return ptr.item;
     }
 
     /**
      * Gets the item at the given index, where 0 is the front, 1 is the next item, and so forth.
-     * Uses recursion.
+     * Uses recursion with helper function
      * @param index of the item to be returned
      * @return      the item at the given index, or null if no such item exists
      */
     public T getRecursive(int index) {
-
+        return helperGetRecursive(index, sentinel.next);
     }
 
+    /**
+     * Removes whether the first or last node and returns its value.
+     * @param node node to be removed
+     * @return     the value of the removed node
+     */
+    private T remove(Node<T> node) {
+        if (size == 0) {
+            return null;
+        }
 
+        Node<T> tempNext = node.next;
+        Node<T> tempPrev = node.prev;
+
+        tempPrev.next = tempNext;
+        tempNext.prev = tempPrev;
+        size--;
+
+        return node.item;
+    }
+
+    /**
+     * Gets the item at the given index.
+     * @param index of the item to be returned
+     * @param n     the node to count 
+     * @return      the value at the node
+     */
+    private T helperGetRecursive(int index, Node<T> n) {
+        if (index == 0) {
+            return n.item;
+        }
+        return helperGetRecursive(index - 1, n.next);
+    }
 
 
 
