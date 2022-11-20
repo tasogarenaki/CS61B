@@ -168,7 +168,7 @@ public class LinkedListDeque<T> {
     /**
      * Gets the item at the given index.
      * @param index of the item to be returned
-     * @param n     the node to count 
+     * @param n     the node to count
      * @return      the value at the node
      */
     private T helperGetRecursive(int index, Node<T> n) {
@@ -177,11 +177,5 @@ public class LinkedListDeque<T> {
         }
         return helperGetRecursive(index - 1, n.next);
     }
-
-
-
-
-
-
 
 }
