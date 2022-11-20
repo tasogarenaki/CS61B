@@ -111,7 +111,10 @@ public class ArrayDeque<T> {
         head = (head + 1) % elements.length;
         size--;
 
-        /* Reduce the array to save the memory ((the number of elements / the array's length) < usage Factor). */
+        /*
+         * Reduce the array to save the memory
+         * ((the number of elements / the array's length) < usage Factor).
+         */
         if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
@@ -134,7 +137,8 @@ public class ArrayDeque<T> {
          * After removing the value at the tail element,
          * the tail pointer's position should move (-1).
          */
-        tail = (tail - 1 + elements.length) % elements.length;
+        //tail = (tail - 1 + elements.length) % elements.length;
+        tail = (tail - 1 + size) % size;
         size--;
 
         /* Reduce the array to save the memory. */
@@ -181,7 +185,8 @@ public class ArrayDeque<T> {
          * is less than the length of the element, it means
          * there's nulls before the head pointer.
          * So only non-null items after the head pointer should be copied.
-         * 2) Otherwise, just copy the items on the left and right sides of the head pointer separately.
+         * 2) Otherwise, just copy the items on the left and right sides
+         * of the head pointer separately.
          */
         // if (size + head < elements.length) {
         //     System.arraycopy(elements, head, resized, 0, size);
