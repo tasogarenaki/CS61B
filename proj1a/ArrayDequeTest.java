@@ -155,6 +155,7 @@ public class ArrayDequeTest {
         printTestStatus(passed);
     }
 
+    /** Check if its contains null. */
     public static void someTest() {
         System.out.println("Running some tests.");
 
@@ -165,33 +166,19 @@ public class ArrayDequeTest {
         /* T1 */
         lld1.addLast(0);
         lld1.get(0);
-        // lld1.removeLast();
-        // lld1.removeFirst();
-        // System.out.print(lld1.removeLast());
+        // should be 0
+        passed = checkSize(0, lld1.removeFirst()) && passed;
 
+
+        /* T2 */
+        lld1.addFirst(0);
+        lld1.addFirst(1);
+        lld1.addFirst(2);
+        lld1.addFirst(3);
+        lld1.addFirst(4);
+        lld1.addFirst(5);
+        // should be 0
         passed = checkSize(0, lld1.removeLast()) && passed;
-        // passed = checkSize(0, lld1.removeFirst()) && passed;
-
-
-
-        //
-        // /* T2 */
-        // lld1.addFirst(0);
-        // lld1.addFirst(1);
-        // lld1.addFirst(2);
-        // lld1.addFirst(3);
-        // lld1.addFirst(4);
-        // lld1.addFirst(5);
-        // // int a = lld1.removeLast();
-        // // System.out.print(lld1.removeLast());
-        //
-        // passed = checkSize(0, lld1.removeLast()) && passed;
-
-
-
-
-
-
 
         printTestStatus(passed);
     }
