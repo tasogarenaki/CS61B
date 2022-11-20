@@ -38,6 +38,17 @@ public class ArrayDeque<T> {
      * @param item is the item to be added at the front of the deque.
      */
     public void addFirst(T item) {
+
+
+
+
+        if (item == null)
+            throw new NullPointerException();
+
+
+
+
+
         /*
          * circular, to locate the position of the head pointer.
          * e.g. if element.length = 4 and head = 0 then 3 % 4 = 3,
@@ -59,6 +70,17 @@ public class ArrayDeque<T> {
      * @param item is the item to be added at the end of the deque.
      */
     public void addLast(T item) {
+
+
+
+
+        if (item == null)
+            throw new NullPointerException();
+
+
+
+
+
         elements[tail] = item;
         /* circular adds the tail's position by 1. */
         tail = (tail + 1) % elements.length;
@@ -103,6 +125,16 @@ public class ArrayDeque<T> {
 
         /* Gets the value of the head element. */
         T item = elements[head];
+
+
+
+
+        if (item == null)
+            return null;
+
+
+
+
         elements[head] = null;
         /*
          * After removing the value of the head element,
@@ -110,6 +142,7 @@ public class ArrayDeque<T> {
          */
         head = (head + 1) % elements.length;
         size--;
+
 
         /*
          * Reduce the array to save the memory
@@ -121,6 +154,12 @@ public class ArrayDeque<T> {
         return item;
     }
 
+
+
+
+
+
+
     /**
      * Removes and returns the item to the back of the deque.
      * @return the last item in the deque, if no such item exists, returns null.
@@ -131,13 +170,23 @@ public class ArrayDeque<T> {
         }
 
         /* Gets the value of the tail element. */
-        T item = elements[tail];
-        //elements[tail] = null;
-        /*
-         * After removing the value at the tail element,
-         * the tail pointer's position should move (-1).
-         */
+        // T item = elements[tail];
+        // /*
+        //  * After removing the value at the tail element,
+        //  * the tail pointer's position should move (-1).
+        //  */
+        // tail = ((tail - 1) + elements.length) % elements.length;
+
+
         tail = ((tail - 1) + elements.length) % elements.length;
+        T item = elements[tail];
+
+
+
+        if (item == null)
+            return null;
+
+
         elements[tail] = null;
         size--;
 
