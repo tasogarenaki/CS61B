@@ -132,13 +132,13 @@ public class ArrayDeque<T> {
 
         /* Gets the value of the tail element. */
         T item = elements[tail];
-        elements[tail] = null;
+        //elements[tail] = null;
         /*
          * After removing the value at the tail element,
          * the tail pointer's position should move (-1).
          */
-        //tail = (tail - 1 + elements.length) % elements.length;
-        tail = (tail - 1 + size) % size;
+        tail = (tail - 1 + elements.length) % elements.length;
+        elements[tail] = null;
         size--;
 
         /* Reduce the array to save the memory. */
@@ -174,11 +174,11 @@ public class ArrayDeque<T> {
         /* V1
          * Adds items direct after head, avoid null.
          */
-        // for (int i = 0; i < size; i++) {
-        //     int src = (head + i) % elements.length;
-        //     int dest = i;
-        //     resized[dest] = elements[src];
-        // }
+        for (int i = 0; i < size; i++) {
+            int src = (head + i) % elements.length;
+            int dest = i;
+            resized[dest] = elements[src];
+        }
 
         /* V2: only copy non-null items.
          * 1) If the index of the head pointer plus the current size of the array
@@ -188,14 +188,14 @@ public class ArrayDeque<T> {
          * 2) Otherwise, just copy the items on the left and right sides
          * of the head pointer separately.
          */
-        if (size + head < elements.length) {
-            System.arraycopy(elements, head, resized, 0, size);
-        } else {
-            /* Copy left side items of the head pointer. */
-            System.arraycopy(elements, head, resized, 0, elements.length - head);
-            /* Copy right side items of the head pointer. */
-            System.arraycopy(elements, 0, resized, elements.length - head, head);
-        }
+        // if (size + head < elements.length) {
+        //     System.arraycopy(elements, head, resized, 0, size);
+        // } else {
+        //     /* Copy left side items of the head pointer. */
+        //     System.arraycopy(elements, head, resized, 0, elements.length - head);
+        //     /* Copy right side items of the head pointer. */
+        //     System.arraycopy(elements, 0, resized, elements.length - head, head);
+        // }
 
         elements = resized;
         head = 0;
