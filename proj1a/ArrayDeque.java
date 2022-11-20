@@ -137,7 +137,7 @@ public class ArrayDeque<T> {
          * After removing the value at the tail element,
          * the tail pointer's position should move (-1).
          */
-        tail = (tail - 1 + elements.length) % elements.length;
+        tail = ((tail - 1) + elements.length) % elements.length;
         elements[tail] = null;
         size--;
 
