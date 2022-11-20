@@ -111,8 +111,8 @@ public class ArrayDeque<T> {
         head = (head + 1) % elements.length;
         size--;
 
-        /* Reduce the array to save the memory. */
-        if (size >= 2 * INITIAL_LENGTH && size / elements.length < USAGE_FACTOR) {
+        /* Reduce the array to save the memory ((the number of elements / the array's length) < usage Factor). */
+        if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
         return item;
@@ -138,7 +138,7 @@ public class ArrayDeque<T> {
         size--;
 
         /* Reduce the array to save the memory. */
-        if (size >= 2 * INITIAL_LENGTH && size / elements.length < USAGE_FACTOR) {
+        if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
         return item;
@@ -162,17 +162,40 @@ public class ArrayDeque<T> {
     /**
      * Double the size of the array with newSize, if array is full,
      * which is head equals tail.
+     * Note: ArrayDeque can not contain null.
      * @param newSize is the new length of the array.
      */
     private void calculateSize(int newSize) {
         T[] resized = (T[]) new Object[newSize];
-        /* Copy left side elements of head. */
-        System.arraycopy(elements, head, resized, 0, elements.length - head);
-        /* Copy right side elements of head. */
-        System.arraycopy(elements, 0, resized, elements.length - head, head);
+        /* V1
+         * Adds items direct after head, avoid null.
+         */
+        for (int i = 0; i < size; i++) {
+            int src = (head + i) % elements.length;
+            int dest = i;
+            resized[dest] = elements[src];
+        }
+
+        /* V2: only copy non-null items.
+         * 1) If the index of the head pointer plus the current size of the array
+         * is less than the length of the element, it means
+         * there's nulls before the head pointer.
+         * So only non-null items after the head pointer should be copied.
+         * 2) Otherwise, just copy the items on the left and right sides of the head pointer separately.
+         */
+        // if (size + head < elements.length) {
+        //     System.arraycopy(elements, head, resized, 0, size);
+        // } else {
+        //     /* Copy left side items of the head pointer. */
+        //     System.arraycopy(elements, head, resized, 0, elements.length - head);
+        //     /* Copy right side items of the head pointer. */
+        //     System.arraycopy(elements, 0, resized, elements.length - head, head);
+        // }
+
         elements = resized;
         head = 0;
         tail = size;
     }
 
 }
+
