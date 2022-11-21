@@ -126,7 +126,8 @@ public class ArrayDeque<T> {
          * Reduce the array to save the memory
          * ((the number of elements / the array's length) < usage Factor).
          */
-        if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
+        // if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
+        if (size < elements.length / 4 && size > 8) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
         return item;
@@ -154,7 +155,8 @@ public class ArrayDeque<T> {
         size--;
 
         /* Reduce the array to save the memory. */
-        if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
+        // if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
+        if (size < elements.length / 4 && size > 8) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
         return item;
@@ -186,11 +188,11 @@ public class ArrayDeque<T> {
         /* V1
          * Adds items direct after head, avoid null.
          */
-        // for (int i = 0; i < size; i++) {
-        //     int src = (head + i) % elements.length;
-        //     int dest = i;
-        //     resized[dest] = elements[src];
-        // }
+        for (int i = 0; i < size; i++) {
+            int src = (head + i) % elements.length;
+            int dest = i;
+            resized[dest] = elements[src];
+        }
 
         /* V2: only copy non-null items.
          * 1) If the index of the head pointer plus the current size of the array
@@ -200,14 +202,14 @@ public class ArrayDeque<T> {
          * 2) Otherwise, just copy the items on the left and right sides
          * of the head pointer separately.
          */
-        if (size + head < elements.length) {
-            System.arraycopy(elements, head, resized, 0, size);
-        } else {
-            /* Copy left side items of the head pointer. */
-            System.arraycopy(elements, head, resized, 0, elements.length - head);
-            /* Copy right side items of the head pointer. */
-            System.arraycopy(elements, 0, resized, elements.length - head, head);
-        }
+        // if (size + head < elements.length) {
+        //     System.arraycopy(elements, head, resized, 0, size);
+        // } else {
+        //     /* Copy left side items of the head pointer. */
+        //     System.arraycopy(elements, head, resized, 0, elements.length - head);
+        //     /* Copy right side items of the head pointer. */
+        //     System.arraycopy(elements, 0, resized, elements.length - head, head);
+        // }
 
         elements = resized;
         head = 0;
