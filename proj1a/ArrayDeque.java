@@ -15,6 +15,7 @@ public class ArrayDeque<T> {
 
     private static final int INITIAL_LENGTH = 8;
     private static final int GROWTH_FACTOR = 2;
+    private static final int DOWN_USAGE_FACTOR = 4;
     private static final double USAGE_FACTOR = 0.25;
 
     private T[] elements;
@@ -127,7 +128,8 @@ public class ArrayDeque<T> {
          * ((the number of elements / the array's length) < usage Factor).
          */
         // if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
-        if (size < elements.length / 4 && size > 8) {
+        // if (size < elements.length / 4 && size > 8) {
+        if (size < elements.length / DOWN_USAGE_FACTOR && size > (2 * INITIAL_LENGTH)) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
         return item;
@@ -156,7 +158,8 @@ public class ArrayDeque<T> {
 
         /* Reduce the array to save the memory. */
         // if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
-        if (size < elements.length / 4 && size > 8) {
+        // if (size < elements.length / 4 && size > 8) {
+        if (size < elements.length / DOWN_USAGE_FACTOR && size > (2 * INITIAL_LENGTH)) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
         return item;
