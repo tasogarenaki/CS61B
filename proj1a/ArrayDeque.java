@@ -129,7 +129,7 @@ public class ArrayDeque<T> {
          */
         // if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
         // if (size < elements.length / 4 && size > 8) {
-        if (size < elements.length / DOWN_USAGE_FACTOR && size > (2 * INITIAL_LENGTH)) {
+        if (size > INITIAL_LENGTH && size < elements.length / DOWN_USAGE_FACTOR) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
         return item;
@@ -159,7 +159,7 @@ public class ArrayDeque<T> {
         /* Reduce the array to save the memory. */
         // if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
         // if (size < elements.length / 4 && size > 8) {
-        if (size < elements.length / DOWN_USAGE_FACTOR && size > (2 * INITIAL_LENGTH)) {
+        if (size > INITIAL_LENGTH && size < elements.length / DOWN_USAGE_FACTOR) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
         return item;
