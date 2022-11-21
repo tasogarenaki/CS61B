@@ -16,7 +16,6 @@ public class ArrayDeque<T> {
     private static final int INITIAL_LENGTH = 8;
     private static final int GROWTH_FACTOR = 2;
     private static final int DOWN_USAGE_FACTOR = 4;
-    private static final double USAGE_FACTOR = 0.25;
 
     private T[] elements;
     private int head;   // head pointer at first item
@@ -127,8 +126,6 @@ public class ArrayDeque<T> {
          * Reduce the array to save the memory
          * ((the number of elements / the array's length) < usage Factor).
          */
-        // if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
-        // if (size < elements.length / 4 && size > 8) {
         if (size > INITIAL_LENGTH && size < elements.length / DOWN_USAGE_FACTOR) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
@@ -144,10 +141,7 @@ public class ArrayDeque<T> {
             return null;
         }
 
-        /*
-         * First locate the tail pointer,
-         * then the tail pointer's position should move (-1).
-         */
+        /* First move the tail pointer's position (-1). */
         tail = ((tail - 1) + elements.length) % elements.length;
 
         /* Gets the value of the tail element. */
@@ -157,8 +151,6 @@ public class ArrayDeque<T> {
         size--;
 
         /* Reduce the array to save the memory. */
-        // if (size >= 2 * INITIAL_LENGTH && size < USAGE_FACTOR * elements.length) {
-        // if (size < elements.length / 4 && size > 8) {
         if (size > INITIAL_LENGTH && size < elements.length / DOWN_USAGE_FACTOR) {
             calculateSize(elements.length / GROWTH_FACTOR);
         }
@@ -198,8 +190,8 @@ public class ArrayDeque<T> {
         }
 
         /* V2: only copy non-null items.
-         * 1) If the index of the head pointer plus the current size of the array
-         * is less than the length of the element, it means
+         * 1) If the number of the items plus the index of the head pointer
+         * is less than the length of the array, it means
          * there's nulls before the head pointer.
          * So only non-null items after the head pointer should be copied.
          * 2) Otherwise, just copy the items on the left and right sides
