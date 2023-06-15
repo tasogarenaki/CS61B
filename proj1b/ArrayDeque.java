@@ -64,6 +64,7 @@ public class ArrayDeque<T> implements Deque<T> {
      * Adds an item to the back of the deque.
      * @param item is the item to be added at the end of the deque.
      */
+    @Override
     public void addLast(T item) {
         /* Null values are not allowed in ArrayDeque. */
         if (item == null) {
@@ -83,6 +84,7 @@ public class ArrayDeque<T> implements Deque<T> {
     /**
      * @return true if deque is empty, false otherwise.
      */
+    @Override
     public boolean isEmpty() {
         return size == 0;
     }
@@ -90,6 +92,7 @@ public class ArrayDeque<T> implements Deque<T> {
     /**
      * @return the number of elements in the deque.
      */
+    @Override
     public int size() {
         return size;
     }
@@ -97,6 +100,7 @@ public class ArrayDeque<T> implements Deque<T> {
     /**
      * Prints the elements in the deque from first to last, separated by a space.
      */
+    @Override
     public void printDeque() {
         for (int i = 0; i < size; i++) {
             System.out.print(get(i) + " ");
@@ -107,6 +111,7 @@ public class ArrayDeque<T> implements Deque<T> {
      * Removes and returns the first item in the deque.
      * @return the first item in the deque, if no such item exists, returns null.
      */
+    @Override
     public T removeFirst() {
         if (isEmpty()) {
             return null;
@@ -137,6 +142,7 @@ public class ArrayDeque<T> implements Deque<T> {
      * Removes and returns the item to the back of the deque.
      * @return the last item in the deque, if no such item exists, returns null.
      */
+    @Override
     public T removeLast() {
         if (isEmpty()) {
             return null;
@@ -164,6 +170,7 @@ public class ArrayDeque<T> implements Deque<T> {
      * @param index of the item to be returned (!= pointer's position)
      * @return      the item at the given index, or null if no such item exists
      */
+    @Override
     public T get(int index) {
         if (isEmpty() || index > size) {
             return null;
