@@ -6,6 +6,8 @@ public class TestPalindrome {
     // new Palindromes, or the autograder might be upset.
     static Palindrome palindrome = new Palindrome();
 
+    /* These test Palindrome.isPalindrome(String word) */
+
     @Test
     public void testWordToDeque() {
         Deque d = palindrome.wordToDeque("persiflage");
@@ -15,4 +17,45 @@ public class TestPalindrome {
         }
         assertEquals("persiflage", actual);
     }
+
+    @Test
+    public void testIsPalindromeLengthZero() {
+        String wordOfLengthZero = "";
+        assertTrue(palindrome.isPalindrome(wordOfLengthZero));
+    }
+
+    @Test
+    public void testIsPalindromeLengthOne() {
+        String wordOfLengthOne = "a";
+        assertTrue(palindrome.isPalindrome(wordOfLengthOne));
+    }
+
+    @Test
+    public void testIsPalindromeIsPalindrome() {
+        String wordIsPalindrome= "racecar";
+        assertTrue(palindrome.isPalindrome(wordIsPalindrome));
+    }
+
+    @Test
+    public void testIsPalindromeIsPalindrome2() {
+        String wordIsPalindrome= "noon";
+        assertTrue(palindrome.isPalindrome(wordIsPalindrome));
+    }
+
+    @Test
+    public void testIsPalindromeIsNotPalindrome() {
+        String wordIsNotPalindrome= "cat";
+        assertFalse(palindrome.isPalindrome(wordIsNotPalindrome));
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
