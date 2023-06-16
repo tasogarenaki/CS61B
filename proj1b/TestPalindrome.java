@@ -32,19 +32,19 @@ public class TestPalindrome {
 
     @Test
     public void testIsPalindromeIsPalindrome() {
-        String wordIsPalindrome= "racecar";
+        String wordIsPalindrome = "racecar";
         assertTrue(palindrome.isPalindrome(wordIsPalindrome));
     }
 
     @Test
     public void testIsPalindromeIsPalindrome2() {
-        String wordIsPalindrome= "noon";
+        String wordIsPalindrome = "noon";
         assertTrue(palindrome.isPalindrome(wordIsPalindrome));
     }
 
     @Test
     public void testIsPalindromeIsNotPalindrome() {
-        String wordIsNotPalindrome= "cat";
+        String wordIsNotPalindrome = "cat";
         assertFalse(palindrome.isPalindrome(wordIsNotPalindrome));
     }
 
@@ -66,19 +66,19 @@ public class TestPalindrome {
 
     @Test
     public void testIsPalindromeCCIsPalindrome() {
-        String wordIsPalindrome= "flake";
+        String wordIsPalindrome = "flake";
         assertTrue(palindrome.isPalindrome(wordIsPalindrome, obo));
     }
 
     @Test
     public void testIsPalindromeCCIsNotPalindrome() {
-        String wordIsNotPalindrome= "Flake";
+        String wordIsNotPalindrome = "Flake";
         assertFalse(palindrome.isPalindrome(wordIsNotPalindrome, obo));
     }
 
     @Test
     public void testIsPalindromeCCIsNotPalindrome2() {
-        String wordIsNotPalindrome= "az";
+        String wordIsNotPalindrome = "az";
         assertFalse(palindrome.isPalindrome(wordIsNotPalindrome, obo));
     }
 }
