@@ -37,6 +37,32 @@ public class Palindrome {
         }
         Character first = chars.removeFirst();
         Character last = chars.removeLast();
-        return first.equals(last) && last.equals(first);
+        return first.equals(last) && helperPalindrome(chars);
+    }
+
+    /**
+     * Checks if a String is a palindrome.
+     * @param word  the String to be checked.
+     * @param cc    is an instance of CharacterComparator for comparing equality of characters.
+     * @return      true or false whether the String is a palindrome or not.
+     */
+    public boolean isPalindrome(String word, CharacterComparator cc) {
+        Deque<Character> chars = wordToDeque(word);
+        return helperPalindrome(chars, cc);
+    }
+
+    /**
+     * Checks whether the characters satisfies the conditions for a palindrome.
+     * @param chars is a Deque.
+     * @param cc    is an instance of CharacterComparator for comparing equality of characters.
+     * @return      true or false whether the String is a palindrome or not.
+     */
+    private boolean helperPalindrome(Deque<Character> chars, CharacterComparator cc) {
+        if (chars.size() == 1 || chars.size() == 0) {
+            return true;
+        }
+        Character first = chars.removeFirst();
+        Character last = chars.removeLast();
+        return cc.equalChars(first, last) && helperPalindrome(chars, cc);
     }
 }

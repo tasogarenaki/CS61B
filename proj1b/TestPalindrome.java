@@ -48,14 +48,37 @@ public class TestPalindrome {
         assertFalse(palindrome.isPalindrome(wordIsNotPalindrome));
     }
 
+    /* These test Palindrome.isPalindrome((String word, CharacterComparator cc) */
 
+    static CharacterComparator obo = new OffByOne();
 
+    @Test
+    public void testIsPalindromeCCLengthZero() {
+        String wordOfLengthZero = "";
+        assertTrue(palindrome.isPalindrome(wordOfLengthZero, obo));
+    }
 
+    @Test
+    public void testIsPalindromeCCLengthOne() {
+        String wordOfLengthOne = "a";
+        assertTrue(palindrome.isPalindrome(wordOfLengthOne, obo));
+    }
 
+    @Test
+    public void testIsPalindromeCCIsPalindrome() {
+        String wordIsPalindrome= "flake";
+        assertTrue(palindrome.isPalindrome(wordIsPalindrome, obo));
+    }
 
+    @Test
+    public void testIsPalindromeCCIsNotPalindrome() {
+        String wordIsNotPalindrome= "Flake";
+        assertFalse(palindrome.isPalindrome(wordIsNotPalindrome, obo));
+    }
 
-
-
-
-
+    @Test
+    public void testIsPalindromeCCIsNotPalindrome2() {
+        String wordIsNotPalindrome= "az";
+        assertFalse(palindrome.isPalindrome(wordIsNotPalindrome, obo));
+    }
 }
