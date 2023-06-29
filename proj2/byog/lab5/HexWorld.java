@@ -14,13 +14,42 @@ import java.util.Random;
 public class HexWorld {
 
 
-
-    private static int[] calcNumTilesPerCol(int size) {
-        int numCols = size * 3 - 2;
-        
-
+    /**
+     * Picks a RANDOM tile.
+     */
+    private static TETile randomTile() {
+        int tileNum = RANDOM.nextInt(5);
+        switch (tileNum) {
+            case 0: return Tileset.WALL;
+            case 1: return Tileset.FLOWER;
+            case 2: return Tileset.GRASS;
+            case 3: return Tileset.TREE;
+            case 4: return Tileset.SAND;
+            default: return Tileset.NOTHING;
+        }
     }
 
+    /**
+     * Calculates the number of tiles at each column.
+     * @param size      size of the sides of the hexagon.
+     * @param height    size of the hexagon.
+     * @return          an array contains the number of tiles in each column.
+     */
+    private static int[] calcNumTilesPerCol(int size, int height) {
+        int numCols = size * 3 - 2;
+        int[] numTilesPerCol = new int[numCols];
+
+        for (int i = 0; i < numCols; i++) {
+            if (i < size - 2) {
+                numTilesPerCol[i] = 2 * (i + 1);
+            } else if (i > 2 * (size - 1)) {
+                numTilesPerCol[i] = 2 * (numCols - i);
+            } else {
+                numTilesPerCol[i] = height;
+            }
+        }
+        return numTilesPerCol;
+    }
 
     /**
      * Generates a hexagonal region, comprised of tiles.
@@ -44,7 +73,7 @@ public class HexWorld {
      */
     public static void addHexagon(TETile[][] world, int posX, int posY, int size, TETile tile) {
         int height = size * 2;
-        int[] numTilesPerCol = calcNumTilesPerCol(size);
+        int[] numTilesPerCol = calcNumTilesPerCol(size, height);
         int numCols = numTilesPerCol.length;    // middle of the Hexagon is the maximum.
 
         if (size < 2) {
