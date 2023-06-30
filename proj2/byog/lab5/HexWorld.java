@@ -13,18 +13,77 @@ import java.util.Random;
  */
 public class HexWorld {
 
+    /* Size of the hexagon to be drawn. */
+    private static final int HEXAGON_SIZE = 3;
+    /* Maximum number of the hexagons in the vertical direction. */
+    private static final int MAX_NUM_VERTICAL_TILES = 5;
+
+    /* For randomly tiles. */
+    private static final long SEED = 2873123;
+    private static final Random RANDOM = new Random(SEED);
+
+    /**
+     * Draws a column of hexagons bottom up with random tiles, one by one.
+     * @param p         the origin point of the bottom hexagon.
+     * @param n         number of the hexagons that the column contains.
+     * @param size      size of each hexagon to be drawn.
+     * @param height    height of the hexagon to be drawn.
+     * @param world     the world contains all the hexagons.
+     */
+    private static void drawRandomVerticalHexes(Point p, int n, int size, int height, TETile[][] world) {
+        for (int i = 0; i < n; i++) {
+            int x = p.x;
+            int y = p.y + i * height;
+            TETile tile = randomTile();
+            addHexagon(world, x, y, size, height, tile);
+        }
+    }
+
+    /**
+     * Computes the position of the top right neighbor hexagon base on a hexagon whose origin is p.
+     * It's like laying hexagon tiles in the bathroom.
+     * The top right neighbor tile should higher than the reference tile,
+     * which means, the origin of this new tile should start direct next to
+     * the top right point of the reference tile.
+     * @param p     the origin oth the reference hexagon.
+     * @param size  size of the hexagon.
+     * @return      origin of the new hexagon.
+     */
+    private static Point topRightNeighbor(Point p, int size) {
+        int x = p.x + 2 * size - 1;
+        int y = p.y + size;
+        return new Point(x, y);
+    }
+
+    /**
+     * Computes the position of the bottom right neighbor hexagon base on a hexagon whose origin is p.
+     * Similar to top right tile. The bottom right tile should lower than the reference tile.
+     * The mirror point of the origin of this new tile should next to
+     * the bottom right point of the reference tile.
+     * @param p     the origin oth the reference hexagon.
+     * @param size  size of the hexagon.
+     * @return      origin of the new hexagon.
+     */
+    private static Point bottomRightNeighbor(Point p, int size) {
+        int x = p.x + 2 * size - 1;
+        int y = p.y - size;
+        return new Point(x, y);
+    }
 
     /**
      * Picks a RANDOM tile.
      */
     private static TETile randomTile() {
-        int tileNum = RANDOM.nextInt(5);
+        int tileNum = RANDOM.nextInt(8);
         switch (tileNum) {
             case 0: return Tileset.WALL;
             case 1: return Tileset.FLOWER;
             case 2: return Tileset.GRASS;
             case 3: return Tileset.TREE;
             case 4: return Tileset.SAND;
+            case 5: return Tileset.FLOOR;
+            case 6: return Tileset.LOCKED_DOOR;
+            case 7: return Tileset.WATER;
             default: return Tileset.NOTHING;
         }
     }
@@ -40,7 +99,7 @@ public class HexWorld {
         int[] numTilesPerCol = new int[numCols];
 
         for (int i = 0; i < numCols; i++) {
-            if (i < size - 2) {
+            if (i < size - 1) {
                 numTilesPerCol[i] = 2 * (i + 1);
             } else if (i > 2 * (size - 1)) {
                 numTilesPerCol[i] = 2 * (numCols - i);
@@ -69,10 +128,10 @@ public class HexWorld {
      * @param posX      coordinate of the lower left corner of the hexagon.
      * @param posY      coordinate of the lower left corner of the hexagon.
      * @param size      size number of tiles per side of the hexagon.
+     * @param height    high of the hexagon.
      * @param tile      the type of tile used to generate the hexagon.
      */
-    public static void addHexagon(TETile[][] world, int posX, int posY, int size, TETile tile) {
-        int height = size * 2;
+    public static void addHexagon(TETile[][] world, int posX, int posY, int size, int height, TETile tile) {
         int[] numTilesPerCol = calcNumTilesPerCol(size, height);
         int numCols = numTilesPerCol.length;    // middle of the Hexagon is the maximum.
 
@@ -93,13 +152,56 @@ public class HexWorld {
 
     }
 
+    /**
+     * Create a point with two coordinates x and y.
+     */
+    public static class Point {
+        public final int x;
+        public final int y;
 
-
-
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
 
     public static void main(String[] args) {
 
+        /* Height of the symmetrical Hexagon. */
+        int height = HEXAGON_SIZE * 2;
+        /* Height of the world (in the middle of all hexagons). */
+        final int HEIGHT = MAX_NUM_VERTICAL_TILES * height;
 
+        /* Calculate the origins of the 5 hexagons to build the world. */
+        Point p0 = new Point(0, height);
+        Point p1 = bottomRightNeighbor(p0, HEXAGON_SIZE);
+        Point p2 = bottomRightNeighbor(p1, HEXAGON_SIZE);
+        Point p3 = topRightNeighbor(p2, HEXAGON_SIZE);
+        Point p4 = topRightNeighbor(p3, HEXAGON_SIZE);
 
+        /* Calculate the width of the world. */
+        final int WIDTH = p4.x + HEXAGON_SIZE * 3 - 1;
+
+        /* Initialize the tile rendering engine with a window of size WIDTH x HEIGHT. */
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+
+        /* Initialize tiles. */
+        TETile[][] world = new TETile[WIDTH][HEIGHT];
+        for (int x = 0; x < WIDTH; x += 1) {
+            for (int y = 0; y < HEIGHT; y += 1) {
+                world[x][y] = Tileset.NOTHING;
+            }
+        }
+
+        /* Draw columns of hexagons. */
+        drawRandomVerticalHexes(p0, 3, HEXAGON_SIZE, height, world);
+        drawRandomVerticalHexes(p1, 4, HEXAGON_SIZE, height, world);
+        drawRandomVerticalHexes(p2, 5, HEXAGON_SIZE, height, world);
+        drawRandomVerticalHexes(p3, 4, HEXAGON_SIZE, height, world);
+        drawRandomVerticalHexes(p4, 3, HEXAGON_SIZE, height, world);
+
+        /* Draws the world to the screen. */
+        ter.renderFrame(world);
     }
 }
