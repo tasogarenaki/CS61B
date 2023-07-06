@@ -25,16 +25,18 @@ public class MemoryGame {
         }
 
         int seed = Integer.parseInt(args[0]);
-        MemoryGame game = new MemoryGame(40, 40);
+        Random rand = new Random(seed);
+        MemoryGame game = new MemoryGame(40, 40, rand);
         game.startGame();
     }
 
-    public MemoryGame(int width, int height) {
+    public MemoryGame(int width, int height, Random rand) {
         /* Sets up StdDraw so that it has a width by height grid of 16 by 16 squares as its canvas
          * Also sets up the scale so the top left is (0,0) and the bottom right is (width, height)
          */
         this.width = width;
         this.height = height;
+        this.rand = rand;
         StdDraw.setCanvasSize(this.width * 16, this.height * 16);
         Font font = new Font("Monaco", Font.BOLD, 30);
         StdDraw.setFont(font);
@@ -43,12 +45,19 @@ public class MemoryGame {
         StdDraw.clear(Color.BLACK);
         StdDraw.enableDoubleBuffering();
 
-        //TODO: Initialize random number generator
     }
 
+    /**
+     * Generates a random String of lowercase letters.
+     * @param n length of the String to generate.
+     * @return  a String of random letters from the CHARACTERS String.
+     */
     public String generateRandomString(int n) {
-        //TODO: Generate random string of letters of length n
-        return null;
+        String s = new String();
+        for (int i = 0; i < n; i++) {
+            s += CHARACTERS[rand.nextInt(CHARACTERS.length)];
+        }
+        return s;
     }
 
     public void drawFrame(String s) {
