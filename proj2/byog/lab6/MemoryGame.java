@@ -15,8 +15,8 @@ public class MemoryGame {
     private boolean playerTurn;
     private static final char[] CHARACTERS = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     private static final String[] ENCOURAGEMENT = {"You can do this!", "I believe in you!",
-                                                   "You got this!", "You're a star!", "Go Bears!",
-                                                   "Too easy for you!", "Wow, so impressive!"};
+            "You got this!", "You're a star!", "Go Bears!",
+            "Too easy for you!", "Wow, so impressive!"};
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -44,7 +44,6 @@ public class MemoryGame {
         StdDraw.setYscale(0, this.height);
         StdDraw.clear(Color.BLACK);
         StdDraw.enableDoubleBuffering();
-
     }
 
     /**
@@ -60,24 +59,78 @@ public class MemoryGame {
         return s;
     }
 
+    /**
+     * Displays a String centered on the window and the status menu of the game.
+     * @param s is the String to be displayed.
+     */
     public void drawFrame(String s) {
-        //TODO: Take the string and display it in the center of the screen
-        //TODO: If game is not over, display relevant game information at the top of the screen
+        StdDraw.clear(Color.BLACK);
+        StdDraw.setFont(new Font("Monaco", Font.BOLD, 30));
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.text(width / 2, height / 2, s);
+        if (!gameOver) {
+            StdDraw.setFont(new Font("Arial", Font.BOLD, 20));
+            StdDraw.textLeft(1, height - 1, "Round: " + round);
+            if (playerTurn) {
+                StdDraw.text(width / 2, height - 1, "Type!");
+            } else {
+                StdDraw.text(width / 2, height - 1, "Watch!");
+            }
+            StdDraw.textRight(width - 1, height - 1, ENCOURAGEMENT[round % ENCOURAGEMENT.length]);
+            StdDraw.line(0, height - 2, width, height - 2);
+        }
+        StdDraw.show();
     }
 
+    /**
+     * Displays each character in letters, blanking the screen between characters.
+     * @param letters String whose characters are to be displayed.
+     */
     public void flashSequence(String letters) {
-        //TODO: Display each character in letters, making sure to blank the screen between letters
+        for (int i = 0; i < letters.length(); i++) {
+            drawFrame(Character.toString(letters.charAt(i)));
+            StdDraw.pause(1000);
+            StdDraw.clear(Color.BLACK);
+            StdDraw.pause(500);
+        }
     }
 
+    /**
+     * Read n letters of player input
+     * @param n number of letters to read
+     * @return the letters
+     */
     public String solicitNCharsInput(int n) {
-        //TODO: Read n letters of player input
-        return null;
+        playerTurn = true;
+        StringBuilder letters = new StringBuilder();
+        while (n != 0) {
+            if (StdDraw.hasNextKeyTyped()) {
+                letters.append(StdDraw.nextKeyTyped());
+                n--;
+            }
+            drawFrame(letters.toString());
+        }
+        StdDraw.pause(500);
+        return letters.toString();
     }
 
+    /**
+     * Plays the memory game.
+     */
     public void startGame() {
-        //TODO: Set any relevant variables before the game starts
-
-        //TODO: Establish Game loop
+        round = 1;
+        while (!gameOver) {
+            playerTurn = false;
+            drawFrame("Round: " + round);
+            StdDraw.pause(1000);
+            String random = generateRandomString(round);
+            flashSequence(random);
+            String answer = solicitNCharsInput(round);
+            if (!answer.equals(random)) {
+                drawFrame("Game Over! You made it to round: " + round);
+                gameOver = true;
+            }
+            round++;
+        }
     }
-
 }
