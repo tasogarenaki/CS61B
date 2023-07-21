@@ -1,12 +1,14 @@
 package synthesizer;
 
+import java.util.Iterator;
+
 /**
  * BoundedQueue Interface.
  * Items can only be enqueued at the back of the queue,
  * and can only be dequeued from the front of the queue.
  * Nothing is allowed to enqueue if the queue is full.
  */
-public interface BoundedQueue<T> {
+public interface BoundedQueue<T> extends Iterable<T> {
 
     int capacity();     // return size of the buffer
     int fillCount();    // return number of items currently in the buffer
