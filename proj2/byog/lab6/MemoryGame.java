@@ -7,10 +7,10 @@ import java.awt.Font;
 import java.util.Random;
 
 public class MemoryGame {
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
     private int round;
-    private Random rand;
+    private final Random rand;
     private boolean gameOver;
     private boolean playerTurn;
     private static final char[] CHARACTERS = "abcdefghijklmnopqrstuvwxyz".toCharArray();
