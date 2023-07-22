@@ -5,6 +5,8 @@ import byog.TileEngine.TETile;
 /** This is the main entry point for the program. This class simply parses
  *  the command line inputs, and lets the byog.Core.Game class take over
  *  in either keyboard or input string mode.
+ *  Note: to give a command-line in IntelliJ MacOS:
+ *  control + option + R - E - Enter - Program arguments - Run
  */
 public class Main {
     public static void main(String[] args) {
