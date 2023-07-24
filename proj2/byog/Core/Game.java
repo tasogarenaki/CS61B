@@ -75,6 +75,9 @@ public class Game {
                 case Keys.PRE_QUIT_SAVE:
                     if (it.next() == Keys.QUIT_SAVE) {
                         // TODO: save the word then quite
+
+
+
                     }
 
                 case Keys.UP:
@@ -86,11 +89,14 @@ public class Game {
 
                     }
                     seed = seed * 10 + c - '0';     // Note that c is a char digit, e.g. '1' - '0' = 49 - 48 = 1
-                    Random rand = new Random(seed);
-                    MapGenerator rdw = MapGenerator.generateWorld(rand);
-                    player = MapGenerator.getPlayer();
+                    /* seed: #####S, after 'S' should all seeds set to the world. */
+                    if (it.next() == Keys.DOWN) {
+                        Random rand = new Random(seed);
+                        MapGenerator rdw = MapGenerator.generateWorld(rand);
+                        player = MapGenerator.getPlayer();
 
-
+                        it.next();
+                    }
                 }
 
             }
