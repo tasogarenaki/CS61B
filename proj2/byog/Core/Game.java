@@ -2,14 +2,20 @@ package byog.Core;
 
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
+import byog.lab6.MemoryGame;
 
 import java.text.StringCharacterIterator;
+import java.util.Random;
 
 public class Game {
     TERenderer ter = new TERenderer();
-    /* Feel free to change the width and height. */
-    public static final int WIDTH = 80;
-    public static final int HEIGHT = 30;
+
+    private static long seed;
+
+
+    private MapGenerator.Coordinate player;
+
+
 
 
 
@@ -48,8 +54,8 @@ public class Game {
 
     /**
      * Process commands.
-     * @param input
-     * @param mode
+     * @param input the String to be processed.
+     * @param mode  the mode of the game.
      */
     private void processChar(String input, int mode) {
         /* Uses iterator to process every char of input. */
@@ -60,7 +66,10 @@ public class Game {
             c = it.current();
             switch (c) {
                 case Keys.NEW_GAME:
-                    // TODO: for keyboard
+                    if (mode == KEYBOARDMODE) {
+                        // TODO: for keyboard
+                    }
+                    seed = 0;
 
 
                 case Keys.PRE_QUIT_SAVE:
@@ -73,6 +82,14 @@ public class Game {
                 default:
                 if(Character.isDigit(c)) {
                     // TODO: for seeds
+                    if (mode == KEYBOARDMODE) {
+
+                    }
+                    seed = seed * 10 + c - '0';     // Note that c is a char digit, e.g. '1' - '0' = 49 - 48 = 1
+                    Random rand = new Random(seed);
+                    MapGenerator rdw = MapGenerator.generateWorld(rand);
+                    player = MapGenerator.getPlayer();
+
 
                 }
 
