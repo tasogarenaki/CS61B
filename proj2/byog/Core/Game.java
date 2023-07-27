@@ -1,10 +1,18 @@
 package byog.Core;
 
+import java.awt.Font;
+import java.awt.Color;
+
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.lab6.MemoryGame;
 
 import java.text.StringCharacterIterator;
+
+import edu.princeton.cs.algs4.ST;
+import edu.princeton.cs.introcs.StdDraw;
+
+import java.util.Map;
 import java.util.Random;
 
 public class Game {
@@ -14,6 +22,8 @@ public class Game {
 
 
     private MapGenerator.Coordinate player;
+
+    private GameState gameState;
 
 
 
@@ -72,15 +82,46 @@ public class Game {
                     seed = 0;
 
 
+                case Keys.LOAD_GAME:
+                    if (mode == KEYBOARDMODE) {
+                        // TODO: for keyboard
+                    }
+                    gameState = GameState.loadWorld();
+                    player = MapGenerator.getPlayer();
+
+
+                /* Save and Quite via String. */
                 case Keys.PRE_QUIT_SAVE:
                     if (it.next() == Keys.QUIT_SAVE) {
-                        // TODO: save the word then quite
-
-
-
+                        // TODO: save the word then quite by using String
+                        GameState.saveWorld(gameState);
+                        System.exit(0);
+                        break;
                     }
+                    break;
 
+                /* Quite via Keyboard. */
+                case Keys.QUIT_SAVE:
+                    if (mode == STRINGMODE) {
+                        break;
+                    }
+                    MapGenerator.displayMessage("SAVE GAME? (Y/N)");
+                    while (true) {
+                        if (it.next() == Keys.YES) {
+                            GameState.saveWorld(gameState);
+                            System.exit(0);
+                            break;
+                        } else if (it.next() == Keys.NO) {
+                            break;
+                        }
+                    }
+                    break;
+
+                // TODO: Directions
                 case Keys.UP:
+                case Keys.DOWN:
+                case Keys.LEFT:
+                case Keys.RIGHT:
 
                 default:
                 if(Character.isDigit(c)) {
@@ -89,6 +130,7 @@ public class Game {
 
                     }
                     seed = seed * 10 + c - '0';     // Note that c is a char digit, e.g. '1' - '0' = 49 - 48 = 1
+
                     /* seed: #####S, after 'S' should all seeds set to the world. */
                     if (it.next() == Keys.DOWN) {
                         Random rand = new Random(seed);
@@ -102,6 +144,9 @@ public class Game {
             }
             it.next();
         }
+
+
+
 
 
 
