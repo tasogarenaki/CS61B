@@ -1,7 +1,14 @@
 package byog.Core;
 
+import byog.SaveDemo.World;
 import byog.TileEngine.TETile;
+import byog.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.Random;
 
 import java.awt.*;
 
@@ -29,7 +36,30 @@ public class MapGenerator {
 
     }
 
-    public static TETile[][] generateWorld(Rand rand) {
+    private static class World {
+        private List<Room> rooms;
+        private List<Hallway> hallways;
+        private TETile[][] map;
+
+        World() {
+            rooms = new ArrayList<>();
+            hallways = new ArrayList<>();
+            map = new TETile[WIDTH][HEIGHT];
+        }
+    }
+
+    public static TETile[][] generateWorld(Random rand) {
+        World world = new World();
+        TETile[][] map = world.map;
+
+        /* Initialize the world. */
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                map[x][y] = Tileset.NOTHING;
+            }
+        }
+
+
         return null;
     }
 

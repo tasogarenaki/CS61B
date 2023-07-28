@@ -1,6 +1,10 @@
 package byog.Core;
 
-import byog.SaveDemo.World;
+import byog.TileEngine.TETile;
+
+import java.io.Serializable;
+
+import java.util.Random;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,6 +20,21 @@ public class GameState implements Serializable {
 
     /* File to save the game state. */
     private static final String PATH = "./game.txt";
+
+    public TETile[][] world;
+    public Random rand;
+
+
+
+    public GameState() {
+        world = null;
+        rand = null;
+    }
+
+    public GameState(TETile[][] world, Random rand) {
+        this.world = world;
+        this.rand = rand;
+    }
 
 
     /**

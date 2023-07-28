@@ -56,9 +56,7 @@ public class Game {
 
         processChar(input, STRINGMODE);
 
-
-
-        return null;
+        return gameState.world;
     }
 
 
@@ -124,23 +122,25 @@ public class Game {
                 case Keys.RIGHT:
 
                 default:
-                if(Character.isDigit(c)) {
-                    // TODO: for seeds
-                    if (mode == KEYBOARDMODE) {
+                    if(Character.isDigit(c)) {
+                        // TODO: for seeds
+                        if (mode == KEYBOARDMODE) {
 
+                        }
+                        seed = seed * 10 + c - '0';     // Note that c is a char digit, e.g. '1' - '0' = 49 - 48 = 1
+
+                        /* seed: #####S, after 'S' should all seeds set to the world. */
+                        if (it.next() == Keys.DOWN) {
+                            gameState.rand = new Random(seed);
+                            gameState.world = MapGenerator.generateWorld(gameState.rand);
+                            player = MapGenerator.getPlayer();
+
+
+                            it.next();
+                            break;
+                        }
                     }
-                    seed = seed * 10 + c - '0';     // Note that c is a char digit, e.g. '1' - '0' = 49 - 48 = 1
-
-                    /* seed: #####S, after 'S' should all seeds set to the world. */
-                    if (it.next() == Keys.DOWN) {
-                        Random rand = new Random(seed);
-                        MapGenerator rdw = MapGenerator.generateWorld(rand);
-                        player = MapGenerator.getPlayer();
-
-                        it.next();
-                    }
-                }
-
+                    break;
             }
             it.next();
         }
