@@ -24,6 +24,15 @@ public class MapGenerator {
     private static final int ROOM_LIMIT = 200;   // maximum number of rooms
 
 
+    /* Directions */
+    private static final int NORTH = 0;
+    private static final int SOUTH = 1;
+    private static final int WEST = 2;
+    private static final int EAST = 3;
+    private static final int NORTHWEST = 4;
+    private static final int NORTHEAST = 5;
+    private static final int SOUTHWEST = 6;
+    private static final int SOUTHEAST = 7;
 
 
     /* Set font size to displayed. */
@@ -239,7 +248,7 @@ public class MapGenerator {
                 if (world.map[x][y].equals(Tileset.NOTHING)) {
                     Hallway hallway = new Hallway();
                     Coordinate coors = new Coordinate(x, y);
-                    fillMaze(world.map, rand, hallway,coors);
+                    fillMaze(world.map, rand, hallway, coors);
                     hallwayWall(world.map, hallway);
                     world.hallways.add(hallway);
                 }
@@ -251,22 +260,108 @@ public class MapGenerator {
 
     /**
      * Generate the maze using the flood fill algorithm.
-     * @param map
+     * @param worldMap
      * @param rand
      * @param hallway
-     * @param coors
+     * @param coord
      */
-    private static void fillMaze(TETile[][] map, Random rand, Hallway hallway, Coordinate coors) {
-        int x = coors.x;
-        int y = coors.y;
+    private static void fillMaze(TETile[][] worldMap, Random rand, Hallway hallway, Coordinate coord) {
+        int x = coord.x;
+        int y = coord.y;
+        int lastDir = RandomUtils.uniform(rand, 4);
 
         /* Check whether it is already filled or if it is at the boundary. */
-        if (map[x][y].equals(Tileset.FLOOR) || map[x][y].equals(Tileset.WALL)
+        if (worldMap[x][y].equals(Tileset.FLOOR) || worldMap[x][y].equals(Tileset.WALL)
                 || x == 0 || y == 0 || x == WIDTH || y == HEIGHT) {
             return;
         }
 
-        // TODO: continuing...
+        /* Create a queue and enqueue the coordinates. */
+        ArrayDeque<Coordinate> stack = new ArrayDeque<>();
+        stack.add(coord);
+        hallway.coors.add(coord);
+        worldMap[x][y] = Tileset.FLOOR;
+
+        while(!stack.isEmpty()) {
+            int dir;
+            List<Integer> avblDir = new ArrayList<>();
+            coord = stack.getLast();
+
+            for (int i = 0; i < 4; i++) {
+                //Coordinate firstCoord = applyDir(i, 1, coord);
+                Coordinate secondCoord = applyDir(i, 2, coord);
+
+                /* Unavailable Coordinate.*/
+                if (secondCoord.x <= 0 || secondCoord.x >= WIDTH
+                        || secondCoord.y <= 0 || secondCoord.y >= HEIGHT) {
+                    continue;
+                }
+
+                /* Available Coordinate. */
+                if (worldMap[secondCoord.x][secondCoord.y].equals(Tileset.NOTHING)) {
+                    avblDir.add(i);
+                }
+            }
+
+            if (!avblDir.isEmpty()) {
+                if (avblDir.contains(lastDir) && RandomUtils.uniform(rand, 100) > 40) {
+                    dir = lastDir;
+                } else {
+                    dir = avblDir.get(RandomUtils.uniform(rand, avblDir.size()));
+                }
+
+                Coordinate firstCoord = applyDir(dir, 1, coord);
+                Coordinate secondCoord = applyDir(dir, 2, coord);
+                worldMap[firstCoord.x][firstCoord.y] = Tileset.FLOOR;
+                worldMap[secondCoord.x][secondCoord.y] = Tileset.FLOOR;
+                stack.addLast(secondCoord);
+
+                if (!hallway.coors.contains(firstCoord)) {
+                    hallway.coors.add(firstCoord);
+                }
+                if (!hallway.coors.contains(secondCoord)) {
+                    hallway.coors.add(secondCoord);
+                }
+                lastDir = dir;
+            } else {
+                stack.removeLast();
+            }
+        }
+    }
+
+    /**
+     * Directions and distance to coordinate.
+     * @param dir
+     * @param distance
+     * @param coord
+     * @return  coordinate
+     */
+    protected static Coordinate applyDir(int dir, int distance, Coordinate coord) {
+        switch (dir) {
+            case NORTH:
+                return new Coordinate(coord.x, coord.y + distance);
+            case SOUTH:
+                return new Coordinate(coord.x, coord.y - distance);
+            case WEST:
+                return new Coordinate(coord.x - distance, coord.y);
+            case EAST:
+                return new Coordinate(coord.x + distance, coord.y);
+            case NORTHWEST:
+                return new Coordinate(coord.x - 1, coord.y + 1);
+            case NORTHEAST:
+                return new Coordinate(coord.x + 1, coord.y + 1);
+            case SOUTHWEST:
+                return new Coordinate(coord.x - 1, coord.y - 1);
+            case SOUTHEAST:
+                return new Coordinate(coord.x + 1, coord.y - 1);
+            default:
+                return null;
+        }
+    }
+
+
+    // TODO: generate wall for Hallway
+    private static void hallwayWall(TETile[][] worldMap, Hallway hallway) {
 
     }
 
@@ -277,7 +372,7 @@ public class MapGenerator {
 
 
 
-    // TODO: generate wall for Hallway
+
 
 
 
