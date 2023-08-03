@@ -5,6 +5,7 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.ArrayDeque;
@@ -144,6 +145,8 @@ public class MapGenerator {
         // TODO: generate the world with rooms and connect them.
         generateRoom(world, rand);
         generateMaze(world, rand);
+        findConnects(world);
+        connectRegions(world, rand);
 
 
         return world.map;
@@ -256,8 +259,6 @@ public class MapGenerator {
         }
     }
 
-    // TODO: fill maze
-
     /**
      * Generate the maze using the flood fill algorithm.
      * @param worldMap
@@ -367,15 +368,76 @@ public class MapGenerator {
      */
     private static void hallwayWall(TETile[][] worldMap, Hallway hallway) {
         for (int i = 0; i < hallway.coors.size(); i++) {
-            Coordinate coor = hallway.coors.get(i);
+            Coordinate coord = hallway.coors.get(i);
             for (int j = 0; j < 8; j++) {
-                Coordinate coor2 = applyDir(j, 1, coor);
-                if (worldMap[coor2.x][coor2.y].equals(Tileset.NOTHING)) {
-                    worldMap[coor2.x][coor2.y] = Tileset.WALL;
+                /* Neighbors in all eight directions of the current coordinates of a hallway. */
+                Coordinate coord2 = applyDir(j, 1, coord);
+                if (worldMap[coord2.x][coord2.y].equals(Tileset.NOTHING)) {
+                    worldMap[coord2.x][coord2.y] = Tileset.WALL;
                 }
             }
         }
     }
+
+    /**
+     * Two spaces should be separated by a wall. A coordinate inside the wall should contain
+     * a maximum of 2 floor coordinates (either above and below or left and right).
+     * This implies that if two coordinates are present, the spaces are adjacent and should connect.
+     * @param world
+     */
+    private static void findConnects(World world) {
+        for (int x = 1; x < WIDTH; x++) {
+            for (int y = 1; y < HEIGHT; y++) {
+                if (world.map[x][y].equals(Tileset.WALL)) {
+                    List<Coordinate> floor_coord = new ArrayList<>();
+                    /* Check whether the coordinate adjacent to the wall is a floor. */
+                    for (int i = 0; i < 4; i++) {
+                        Coordinate exp_coord = applyDir(i, 1, new Coordinate(x, y));
+                        if (world.map[exp_coord.x][exp_coord.y].equals(Tileset.FLOOR)) {
+                            floor_coord.add(exp_coord);
+                        }
+                    }
+                    /* If the spaces are adjacent. */
+                    if (floor_coord.size() == 2) {
+                        /* Determine which room or hallway the two floors belong to. */
+                        List<Region> belongsTo = new ArrayList<>();
+                        for (int i = 0; i < 2; i++) {
+                            Coordinate temp = floor_coord.get(i);
+                            for (int j = 0; j < world.rooms.size(); j++) {
+                                Room temp_room = world.rooms.get(j);
+                                if (((temp.x == temp_room.botLeft.x || temp.x == temp_room.topRight.x)
+                                        && (temp.y >= temp_room.botLeft.y || temp.y <= temp_room.topRight.y))
+                                        || ((temp.y == temp_room.botLeft.y || temp.y == temp_room.topRight.y)
+                                        && (temp.x <= temp_room.topRight.x
+                                        && temp.x >= temp_room.botLeft.x))) {
+                                    belongsTo.add(temp_room);
+                                    break;
+                                }
+                            }
+                            for (int j = 0; j < world.hallways.size(); j++) {
+                                Hallway temp_hallway = world.hallways.get(j);
+                                for (int m = 0; m < temp_hallway.coors.size(); m++) {
+                                    Coordinate temp_coord = temp_hallway.coors.get(m);
+                                    if (temp_coord.x == temp.x && temp_coord.y == temp.y) {
+                                        belongsTo.add(temp_hallway);
+                                    }
+                                }
+                            }
+                        }
+                        if (belongsTo.size() == 2 && !belongsTo.get(0).equals(belongsTo.get(1))) {
+                            for (int i = 0; i < 2; i++) {
+                                Region region = belongsTo.get(i);
+                                region.connects.add(new Connect(new Coordinate(x, y),
+                                        belongsTo.get(i - 1)));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // TODO: connect the regions
 
 
 
