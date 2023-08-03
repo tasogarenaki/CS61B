@@ -360,9 +360,21 @@ public class MapGenerator {
     }
 
 
-    // TODO: generate wall for Hallway
+    /**
+     * Generate wall for hallways.
+     * @param worldMap
+     * @param hallway
+     */
     private static void hallwayWall(TETile[][] worldMap, Hallway hallway) {
-
+        for (int i = 0; i < hallway.coors.size(); i++) {
+            Coordinate coor = hallway.coors.get(i);
+            for (int j = 0; j < 8; j++) {
+                Coordinate coor2 = applyDir(j, 1, coor);
+                if (worldMap[coor2.x][coor2.y].equals(Tileset.NOTHING)) {
+                    worldMap[coor2.x][coor2.y] = Tileset.WALL;
+                }
+            }
+        }
     }
 
 
