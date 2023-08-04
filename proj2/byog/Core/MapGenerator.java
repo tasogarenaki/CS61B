@@ -438,6 +438,22 @@ public class MapGenerator {
     }
 
     // TODO: connect the regions
+    private static void connectRegions(World world, Random rand) {
+        int index_rooms = RandomUtils.uniform(rand, world.rooms.size());
+        world.rooms.get(index_rooms).connected = true;
+        List<Connect> list_connects = new ArrayList<>(world.rooms.get(index_rooms).connects);
+
+        while (!list_connects.isEmpty()) {
+            int index_connects = RandomUtils.uniform(rand, list_connects.size());
+            Connect cont = list_connects.get(index_connects);
+            Coordinate coord = cont.coors;
+
+
+        }
+
+
+
+    }
 
 
 
