@@ -147,7 +147,8 @@ public class MapGenerator {
         generateMaze(world, rand);
         findConnects(world);
         connectRegions(world, rand);
-
+        removeDeadEnds(world);
+        addDoorAndCharacter(world, rand);
 
         return world.map;
     }
@@ -437,7 +438,11 @@ public class MapGenerator {
         }
     }
 
-    // TODO: connect the regions
+    /**
+     * Connect rooms and hallways.
+     * @param world
+     * @param rand
+     */
     private static void connectRegions(World world, Random rand) {
         int index_rooms = RandomUtils.uniform(rand, world.rooms.size());
         world.rooms.get(index_rooms).connected = true;
@@ -448,13 +453,34 @@ public class MapGenerator {
             Connect cont = list_connects.get(index_connects);
             Coordinate coord = cont.coors;
 
+            if (!cont.connectTo.connected) {
+                world.map[coord.x][coord.y] = Tileset.FLOOR;
+            }
 
+            /* There's a slight chance of having multiple connections to a single region,
+               and these should be removed from the connects. */
+            for (int i = 0; i < list_connects.size(); i++) {
+                Connect cnt = list_connects.get(i);
+                Coordinate coor = cnt.coors;
+                Region the_region = cnt.connectTo;
+
+                if (the_region.connected) {
+                    if (RandomUtils.uniform(rand, 100) < 1) {
+                        world.map[coor.x][coor.y] = Tileset.FLOOR;
+                    }
+                    list_connects.remove(i);
+                }
+            }
+
+            Region region_connected = cont.connectTo;
+            if (!region_connected.connected) {
+                for (int i = 0; i < region_connected.connects.size(); i++) {
+                    list_connects.add(region_connected.connects.get(i));
+                }
+                region_connected.connected = true;
+            }
         }
-
-
-
     }
-
 
 
 
