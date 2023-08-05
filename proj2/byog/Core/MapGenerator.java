@@ -128,7 +128,7 @@ public class MapGenerator {
 
 
     /**
-     *
+     * World generate.
      * @param rand
      * @return
      */
@@ -147,7 +147,7 @@ public class MapGenerator {
         generateMaze(world, rand);
         findConnects(world);
         connectRegions(world, rand);
-        removeDeadEnds(world);
+        removeDeadEnds(world);          // TODO: ggf. comment this line
         addDoorAndCharacter(world, rand);
 
         return world.map;
@@ -480,6 +480,69 @@ public class MapGenerator {
                 region_connected.connected = true;
             }
         }
+    }
+
+    /**
+     * Remove all the dead ends on the map.
+     * @param world
+     */
+    private static void removeDeadEnds(World world) {
+        while (true) {
+            boolean no_DeadEnds = true;
+
+            for (int x = 0; x <= WIDTH; x++) {
+                for (int y = 0; y <= HEIGHT; y++) {
+                    if (world.map[x][y].equals(Tileset.FLOOR)) {
+                        int count = 0;
+                        for (int i = 0; i < 4; i++) {
+                            Coordinate coord = applyDir(i, 1, new Coordinate(x, y));
+                            if (world.map[coord.x][coord.y].equals(Tileset.WALL)) {
+                                count++;
+                            }
+                        }
+                        /* A dead end should have three directions blocked by walls. */
+                        if (count == 3) {
+                            world.map[x][y] = Tileset.WALL;
+                            no_DeadEnds = false;
+                        }
+                    }
+                }
+            }
+            if (no_DeadEnds) {
+                break;
+            }
+        }
+
+        /* Remove extra walls. */
+        List<Coordinate> to_remove = new ArrayList<>();
+        for (int x = 0; x <= WIDTH; x++) {
+            for (int y = 0; y <= HEIGHT; y++) {
+                boolean redundant = true;
+                for (int i = 0; i < 8; i++) {
+                    Coordinate coord = applyDir(i, 1, new Coordinate(x, y));
+                    if (coord.x < 0 || coord.x >= WIDTH + 1 || coord.y < 0 || coord.y >= HEIGHT + 1) {
+                        continue;
+                    }
+                    if (!world.map[coord.x][coord.y].equals(Tileset.WALL)) {
+                        redundant = false;
+                        break;
+                    }
+                }
+                if (redundant) {
+                    to_remove.add(new Coordinate(x, y));
+                }
+            }
+        }
+        for (int i = 0; i < to_remove.size(); i++) {
+            Coordinate coord = to_remove.get(i);
+            world.map[coord.x][coord.y] = Tileset.NOTHING;
+        }
+    }
+
+
+    private static void addDoorAndCharacter(World world, Random rand) {
+        List<Coordinate> walls = new ArrayList<>();
+        List<Coordinate> floors = new ArrayList<>();
     }
 
 
