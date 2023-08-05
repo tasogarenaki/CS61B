@@ -142,7 +142,7 @@ public class MapGenerator {
                 map[x][y] = Tileset.NOTHING;
             }
         }
-        // TODO: generate the world with rooms and connect them.
+
         generateRoom(world, rand);
         generateMaze(world, rand);
         findConnects(world);
@@ -205,7 +205,6 @@ public class MapGenerator {
 
     /**
      * Fill rooms with floors and surround them with walls.
-     *
      *  ---------------------------------
      *  |                   tR(x+1, y+1)|
      *  |  W          WALL           W  |
@@ -452,7 +451,6 @@ public class MapGenerator {
             int index_connects = RandomUtils.uniform(rand, list_connects.size());
             Connect cont = list_connects.get(index_connects);
             Coordinate coord = cont.coors;
-
             if (!cont.connectTo.connected) {
                 world.map[coord.x][coord.y] = Tileset.FLOOR;
             }
@@ -489,7 +487,6 @@ public class MapGenerator {
     private static void removeDeadEnds(World world) {
         while (true) {
             boolean no_DeadEnds = true;
-
             for (int x = 0; x <= WIDTH; x++) {
                 for (int y = 0; y <= HEIGHT; y++) {
                     if (world.map[x][y].equals(Tileset.FLOOR)) {
@@ -539,10 +536,50 @@ public class MapGenerator {
         }
     }
 
-
+    /**
+     * Randomly add a door to the floor and a potions of a player.
+     * @param world
+     * @param rand
+     */
     private static void addDoorAndCharacter(World world, Random rand) {
-        List<Coordinate> walls = new ArrayList<>();
-        List<Coordinate> floors = new ArrayList<>();
+        List<Coordinate> door = new ArrayList<>();
+        List<Coordinate> player = new ArrayList<>();
+        for (int x = 0; x <= WIDTH; x++) {
+            for (int y = 0; y <= HEIGHT; y++) {
+                if (world.map[x][y].equals(Tileset.WALL)) {
+                    boolean has_nothing = false;
+                    boolean has_floor = false;
+                    /* The coordinates of the door and its two neighbors should be within the wall.
+                       The other two neighbors should be either off the map or on floors.*/
+                    for (int i = 0; i < 4; i++) {
+                        Coordinate coord = applyDir(i, 1, new Coordinate(x, y));
+                        if (coord.x < 0 || coord.x >= WIDTH + 1 || coord.y < 0 || coord.y >= HEIGHT + 1) {
+                            has_nothing = true;
+                            continue;
+                        }
+                        if (world.map[coord.x][coord.y].equals(Tileset.FLOOR)) {
+                            has_floor = true;
+                        } else if (world.map[coord.x][coord.y].equals(Tileset.NOTHING)) {
+                            has_nothing = true;
+                        }
+                    }
+                    if (has_floor && has_nothing) {
+                        door.add(new Coordinate(x, y));
+                    }
+                } else if (world.map[x][y].equals(Tileset.FLOOR)) {
+                    player.add(new Coordinate(x, y));
+                }
+            }
+        }
+        /* Position of a random door. */
+        int index = RandomUtils.uniform(rand, door.size());
+        Coordinate coord = door.get(index);
+        world.map[coord.x][coord.y] = Tileset.LOCKED_DOOR;
+
+        /* Position of a random player. */
+        index = RandomUtils.uniform(rand, player.size());
+        coord = player.get(index);
+        world.map[coord.x][coord.y] = Tileset.PLAYER;
     }
 
 
