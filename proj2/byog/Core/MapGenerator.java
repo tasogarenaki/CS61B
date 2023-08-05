@@ -14,8 +14,8 @@ import java.util.Random;
 import java.awt.*;
 
 public class MapGenerator {
-    private static final int WIDTH = 80;
-    private static final int HEIGHT = 30;
+    public static final int WIDTH = 80;
+    public static final int HEIGHT = 30;
 
     private static final int ROOMMAXLEN = 8;
 
@@ -26,20 +26,21 @@ public class MapGenerator {
 
 
     /* Directions */
-    private static final int NORTH = 0;
-    private static final int SOUTH = 1;
-    private static final int WEST = 2;
-    private static final int EAST = 3;
-    private static final int NORTHWEST = 4;
-    private static final int NORTHEAST = 5;
-    private static final int SOUTHWEST = 6;
-    private static final int SOUTHEAST = 7;
+    public static final int NORTH = 0;
+    public static final int SOUTH = 1;
+    public static final int WEST = 2;
+    public static final int EAST = 3;
+    public static final int NORTHWEST = 4;
+    public static final int NORTHEAST = 5;
+    public static final int SOUTHWEST = 6;
+    public static final int SOUTHEAST = 7;
 
 
     /* Set font size to displayed. */
     private static final int TITLE_FONT_SIZE = 40;
     private static final int INITIAL_COMMANDS_FONT_SIZE = 30;
     private static final int HUD_FONT_SIZE = 16;
+
 
 
     /**
@@ -135,21 +136,18 @@ public class MapGenerator {
     public static TETile[][] generateWorld(Random rand) {
         World world = new World();
         TETile[][] map = world.map;
-
         /* Initialize the world. */
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 map[x][y] = Tileset.NOTHING;
             }
         }
-
         generateRoom(world, rand);
         generateMaze(world, rand);
         findConnects(world);
         connectRegions(world, rand);
         removeDeadEnds(world);          // TODO: ggf. comment this line
         addDoorAndCharacter(world, rand);
-
         return world.map;
     }
 
@@ -581,47 +579,6 @@ public class MapGenerator {
         coord = player.get(index);
         world.map[coord.x][coord.y] = Tileset.PLAYER;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    protected static Coordinate getPlayer() {
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < WIDTH; y++) {
-                // TODO: find the player and return it
-
-            }
-        }
-
-        return null;
-
-    }
-
-
-
-
-
 
 
 

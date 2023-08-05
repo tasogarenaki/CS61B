@@ -5,6 +5,7 @@ import java.awt.Color;
 
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
+import byog.TileEngine.Tileset;
 import byog.lab6.MemoryGame;
 
 import java.text.StringCharacterIterator;
@@ -16,22 +17,27 @@ import java.util.Map;
 import java.util.Random;
 
 public class Game {
-    TERenderer ter = new TERenderer();
 
     private static long seed;
 
+    /* Game modes */
+    private static final int STRINGMODE = 0;
+    private static final int KEYBOARDMODE = 1;
+
+
+
+    TERenderer ter = new TERenderer();
 
     private MapGenerator.Coordinate player;
 
     private GameState gameState;
 
 
-
-
-
-    /* Game modes */
-    private static final int STRINGMODE = 0;
-    private static final int KEYBOARDMODE = 1;
+    public Game() {
+        ter.initialize(byog.Core.MapGenerator.WIDTH, byog.Core.MapGenerator.HEIGHT);
+        gameState = new GameState();
+        StdDraw.enableDoubleBuffering();
+    }
 
 
     /**
@@ -85,7 +91,7 @@ public class Game {
                         // TODO: for keyboard
                     }
                     gameState = GameState.loadWorld();
-                    player = MapGenerator.getPlayer();
+                    player = getPlayer();
 
 
                 /* Save and Quite via String. */
@@ -115,11 +121,14 @@ public class Game {
                     }
                     break;
 
-                // TODO: Directions
                 case Keys.UP:
+                    movePlayer(MapGenerator.NORTH);
                 case Keys.DOWN:
+                    movePlayer(MapGenerator.SOUTH);
                 case Keys.LEFT:
+                    movePlayer(MapGenerator.WEST);
                 case Keys.RIGHT:
+                    movePlayer(MapGenerator.EAST);
 
                 default:
                     if(Character.isDigit(c)) {
@@ -133,7 +142,7 @@ public class Game {
                         if (it.next() == Keys.DOWN) {
                             gameState.rand = new Random(seed);
                             gameState.world = MapGenerator.generateWorld(gameState.rand);
-                            player = MapGenerator.getPlayer();
+                            player = getPlayer();
 
 
                             it.next();
@@ -148,9 +157,40 @@ public class Game {
 
 
 
-
-
-
-
     }
+
+
+
+    /**
+     * Find the player and return it.
+     * @return
+     */
+    private MapGenerator.Coordinate getPlayer() {
+        for (int x = 0; x <= MapGenerator.WIDTH; x++) {
+            for (int y = 0; y <= MapGenerator.WIDTH; y++) {
+                if (gameState.world[x][y].equals(Tileset.PLAYER)) {
+                    return new MapGenerator.Coordinate(x, y);
+                }
+            }
+        }
+        return null;
+    }
+
+
+
+    /**
+     * Move the Player to a new coordinate.
+     * @param direction the direction the player should move in.
+     */
+    private void movePlayer(int direction) {
+        MapGenerator.Coordinate new_coord = MapGenerator.applyDir(direction, 1, player);
+        if (gameState.world[new_coord.x][new_coord.y].equals(Tileset.FLOOR)) {
+            gameState.world[player.x][player.y] = Tileset.FLOOR;
+            player = new_coord;
+            gameState.world[new_coord.x][new_coord.y] = Tileset.PLAYER;
+        }
+    }
+
+
+
 }
