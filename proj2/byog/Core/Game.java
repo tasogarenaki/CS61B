@@ -58,12 +58,9 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
-
         processChar(input, STRINGMODE);
-
         return gameState.world;
     }
-
 
 
     private void drawMenu() {
@@ -183,8 +180,8 @@ public class Game {
      * @return
      */
     private MapGenerator.Coordinate getPlayer() {
-        for (int x = 0; x <= MapGenerator.WIDTH; x++) {
-            for (int y = 0; y <= MapGenerator.WIDTH; y++) {
+        for (int x = 0; x < MapGenerator.WIDTH; x++) {
+            for (int y = 0; y < MapGenerator.HEIGHT; y++) {
                 if (gameState.world[x][y].equals(Tileset.PLAYER)) {
                     return new MapGenerator.Coordinate(x, y);
                 }
