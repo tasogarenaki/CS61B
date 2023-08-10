@@ -38,6 +38,10 @@ public class MapGenerator {
     private static final int INITIAL_COMMANDS_FONT_SIZE = 30;
     private static final int HUD_FONT_SIZE = 16;
 
+
+    // TODO: Debug
+
+
     /**
      * World
      * Generate a random world map contains rooms and hallways.

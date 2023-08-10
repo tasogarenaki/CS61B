@@ -13,6 +13,7 @@ import java.text.StringCharacterIterator;
 import edu.princeton.cs.algs4.ST;
 import edu.princeton.cs.introcs.StdDraw;
 
+import javax.swing.plaf.nimbus.State;
 import java.util.Map;
 import java.util.Random;
 
@@ -87,7 +88,7 @@ public class Game {
         StringCharacterIterator it = new StringCharacterIterator(input.toUpperCase());
         char c;
 
-        while (it.current() != Keys.QUIT_SAVE) {
+        while (it.current() != StringCharacterIterator.DONE) {
             c = it.current();
             switch (c) {
                 case Keys.NEW_GAME:
@@ -98,9 +99,6 @@ public class Game {
                     break;
 
                 case Keys.LOAD_GAME:
-                    if (mode == KEYBOARDMODE) {
-                        // TODO: for keyboard
-                    }
                     gameState = GameState.loadWorld();
                     player = getPlayer();
                     break;
@@ -153,9 +151,7 @@ public class Game {
                 default:
                     if(Character.isDigit(c)) {
                         // TODO: for keyboard
-                        if (mode == KEYBOARDMODE) {
-
-                        }
+                        if (mode == KEYBOARDMODE) { }
 
                         seed = seed * 10 + c - '0';     // Note that c is a char digit, e.g. '1' - '0' = 49 - 48 = 1
 

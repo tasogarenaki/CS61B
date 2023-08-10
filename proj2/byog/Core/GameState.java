@@ -25,7 +25,6 @@ public class GameState implements Serializable {
     public Random rand;
 
 
-
     public GameState() {
         world = null;
         rand = null;
