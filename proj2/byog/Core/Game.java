@@ -18,19 +18,18 @@ import java.util.Random;
 
 public class Game {
 
-    private static long seed;
+    private long seed;
 
     /* Game modes */
     private static final int STRINGMODE = 0;
     private static final int KEYBOARDMODE = 1;
 
-
+    private GameState gameState;
+    private MapGenerator.Coordinate player;
 
     TERenderer ter = new TERenderer();
 
-    private MapGenerator.Coordinate player;
 
-    private GameState gameState;
 
 
     public Game() {
@@ -66,6 +65,21 @@ public class Game {
     }
 
 
+
+    private void drawMenu() {
+        StdDraw.setPenColor(StdDraw.WHITE);
+        Font font1 = new Font("Sans Serif", Font.PLAIN, 70);
+        Font font2 = new Font("Sans Serif", Font.PLAIN, 50);
+        StdDraw.setFont(font1);
+        StdDraw.text(40, 25, "CS61B: THE GAME");
+        StdDraw.setFont(font2);
+        StdDraw.text(40, 20, "New Game (N)");
+        StdDraw.text(40, 15, "Load Game (L)");
+        StdDraw.text(40, 10, "Quit (Q)");
+        StdDraw.show();
+    }
+
+
     /**
      * Process commands.
      * @param input the String to be processed.
@@ -84,7 +98,7 @@ public class Game {
                         // TODO: for keyboard
                     }
                     seed = 0;
-
+                    break;
 
                 case Keys.LOAD_GAME:
                     if (mode == KEYBOARDMODE) {
@@ -92,50 +106,60 @@ public class Game {
                     }
                     gameState = GameState.loadWorld();
                     player = getPlayer();
-
+                    break;
 
                 /* Save and Quite via String. */
                 case Keys.PRE_QUIT_SAVE:
-                    if (it.next() == Keys.QUIT_SAVE) {
-                        // TODO: save the word then quite by using String
-                        GameState.saveWorld(gameState);
-                        System.exit(0);
-                        break;
+                    if (mode == STRINGMODE) {
+                        if (it.next() == Keys.QUIT_SAVE) {
+                            GameState.saveWorld(gameState);
+                            System.exit(0);
+                            break;
+                        }
                     }
                     break;
 
                 /* Quite via Keyboard. */
                 case Keys.QUIT_SAVE:
-                    if (mode == STRINGMODE) {
-                        break;
-                    }
-                    MapGenerator.displayMessage("SAVE GAME? (Y/N)");
-                    while (true) {
-                        if (it.next() == Keys.YES) {
-                            GameState.saveWorld(gameState);
-                            System.exit(0);
-                            break;
-                        } else if (it.next() == Keys.NO) {
-                            break;
+                    if (mode == KEYBOARDMODE) {
+                        MapGenerator.displayMessage("SAVE GAME? (Y/N)");
+                        while (true) {
+                            if (it.next() == Keys.YES) {
+                                GameState.saveWorld(gameState);
+                                System.exit(0);
+                                break;
+                            } else if (it.next() == Keys.NO) {
+                                System.exit(0);
+                                break;
+                            }
                         }
                     }
+                    /* Quite via string without save the game. */
+                    System.exit(0);
                     break;
 
+                /* Move the player. */
                 case Keys.UP:
                     movePlayer(MapGenerator.NORTH);
+                    break;
                 case Keys.DOWN:
                     movePlayer(MapGenerator.SOUTH);
+                    break;
                 case Keys.LEFT:
                     movePlayer(MapGenerator.WEST);
+                    break;
                 case Keys.RIGHT:
                     movePlayer(MapGenerator.EAST);
+                    break;
 
+                /* Set the seeds. */
                 default:
                     if(Character.isDigit(c)) {
-                        // TODO: for seeds
+                        // TODO: for keyboard
                         if (mode == KEYBOARDMODE) {
 
                         }
+
                         seed = seed * 10 + c - '0';     // Note that c is a char digit, e.g. '1' - '0' = 49 - 48 = 1
 
                         /* seed: #####S, after 'S' should all seeds set to the world. */
@@ -143,8 +167,6 @@ public class Game {
                             gameState.rand = new Random(seed);
                             gameState.world = MapGenerator.generateWorld(gameState.rand);
                             player = getPlayer();
-
-
                             it.next();
                             break;
                         }
@@ -153,12 +175,7 @@ public class Game {
             }
             it.next();
         }
-
-
-
-
     }
-
 
 
     /**
@@ -190,6 +207,9 @@ public class Game {
             gameState.world[new_coord.x][new_coord.y] = Tileset.PLAYER;
         }
     }
+
+
+
 
 
 

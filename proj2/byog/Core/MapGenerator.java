@@ -159,8 +159,10 @@ public class MapGenerator {
     private static void generateRoom(World world, Random rand) {
         for (int i = 0; i < ROOM_LIMIT; i++) {
             /* Set room size. */
-            int botLeftX = RandomUtils.uniform(rand, MIN_X, WIDTH);
-            int botLeftY = RandomUtils.uniform(rand, MIN_Y, HEIGHT);
+            //int botLeftX = RandomUtils.uniform(rand, MIN_X, WIDTH-1) + 1;
+            //int botLeftY = RandomUtils.uniform(rand, MIN_Y, HEIGHT-1) + 1;
+            int botLeftX = 2 * RandomUtils.uniform(rand, MIN_X,  (WIDTH - 2) / 2) + 1;
+            int botLeftY = 2 * RandomUtils.uniform(rand, MIN_Y, (HEIGHT - 2) / 2) + 1;
             int topRightX = 2 * RandomUtils.uniform(rand, (botLeftX + 1) / 2,
                     Integer.min(WIDTH, botLeftX + ROOMMAXLEN) / 2);
             int topRightY = 2 * RandomUtils.uniform(rand, (botLeftY + 1) / 2,
