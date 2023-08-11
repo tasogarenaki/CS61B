@@ -18,20 +18,15 @@ import java.util.Map;
 import java.util.Random;
 
 public class Game {
-
-    private long seed;
-
     /* Game modes */
     private static final int STRINGMODE = 0;
     private static final int KEYBOARDMODE = 1;
 
+    /* Game Properties. */
+    private long seed;
     private GameState gameState;
     private MapGenerator.Coordinate player;
-
     TERenderer ter = new TERenderer();
-
-
-
 
     public Game() {
         ter.initialize(byog.Core.MapGenerator.WIDTH, byog.Core.MapGenerator.HEIGHT);
@@ -39,11 +34,11 @@ public class Game {
         StdDraw.enableDoubleBuffering();
     }
 
-
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
+        // TODO: for keyboard
     }
 
     /**
@@ -63,8 +58,7 @@ public class Game {
         return gameState.world;
     }
 
-
-    private void drawMenu() {
+    private void displayMenu() {
         StdDraw.setPenColor(StdDraw.WHITE);
         Font font1 = new Font("Sans Serif", Font.PLAIN, 70);
         Font font2 = new Font("Sans Serif", Font.PLAIN, 50);
@@ -76,7 +70,6 @@ public class Game {
         StdDraw.text(40, 10, "Quit (Q)");
         StdDraw.show();
     }
-
 
     /**
      * Process commands.
@@ -170,7 +163,6 @@ public class Game {
         }
     }
 
-
     /**
      * Find the player and return it.
      * @return
@@ -186,8 +178,6 @@ public class Game {
         return null;
     }
 
-
-
     /**
      * Move the Player to a new coordinate.
      * @param direction the direction the player should move in.
@@ -200,9 +190,6 @@ public class Game {
             gameState.world[new_coord.x][new_coord.y] = Tileset.PLAYER;
         }
     }
-
-
-
 
 
 

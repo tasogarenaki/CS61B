@@ -433,8 +433,8 @@ public class MapGenerator {
      */
     private static void connectRegions(World world, Random rand) {
         int index_rooms = RandomUtils.uniform(rand, world.rooms.size());
-        world.rooms.get(index_rooms).connected = true;
         List<Connect> list_connects = new ArrayList<>(world.rooms.get(index_rooms).connects);
+        world.rooms.get(index_rooms).connected = true;
 
         while (!list_connects.isEmpty()) {
             int index_connects = RandomUtils.uniform(rand, list_connects.size());
@@ -450,7 +450,6 @@ public class MapGenerator {
                 Connect cnt = list_connects.get(i);
                 Coordinate coor = cnt.coors;
                 Region the_region = cnt.connectTo;
-
                 if (the_region.connected) {
                     if (RandomUtils.uniform(rand, 100) < 1) {
                         world.map[coor.x][coor.y] = Tileset.FLOOR;
@@ -533,6 +532,7 @@ public class MapGenerator {
     private static void addDoorAndCharacter(World world, Random rand) {
         List<Coordinate> door = new ArrayList<>();
         List<Coordinate> player = new ArrayList<>();
+        /* Scan all walls and floors for door and player coordinates. */
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 if (world.map[x][y].equals(Tileset.WALL)) {

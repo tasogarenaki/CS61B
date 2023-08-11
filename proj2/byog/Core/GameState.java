@@ -1,11 +1,8 @@
 package byog.Core;
 
 import byog.TileEngine.TETile;
-
 import java.io.Serializable;
-
 import java.util.Random;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -15,7 +12,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class GameState implements Serializable {
-
     private static final long serialVersionUID = 123123123123123L;
 
     /* File to save the game state. */
@@ -34,7 +30,6 @@ public class GameState implements Serializable {
         this.world = world;
         this.rand = rand;
     }
-
 
     /**
      * Reads the file that contains the game state.
@@ -87,6 +82,4 @@ public class GameState implements Serializable {
             System.exit(0);
         }
     }
-
-
 }
