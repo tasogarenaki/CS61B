@@ -323,10 +323,10 @@ public class MapGenerator {
 
     /**
      * Directions and distance to coordinate.
-     * @param dir
-     * @param distance
-     * @param coord
-     * @return  coordinate
+     * @param dir       directions
+     * @param distance  distance to move
+     * @param coord     the coordinate
+     * @return          coordinate after moving.
      */
     protected static Coordinate applyDir(int dir, int distance, Coordinate coord) {
         switch (dir) {
@@ -351,7 +351,6 @@ public class MapGenerator {
         }
     }
 
-
     /**
      * Generate wall for hallways.
      * @param worldMap
@@ -369,7 +368,6 @@ public class MapGenerator {
             }
         }
     }
-
 
     /**
      * Two spaces should be separated by a wall. A coordinate inside the wall should contain
@@ -398,10 +396,9 @@ public class MapGenerator {
                             for (int j = 0; j < world.rooms.size(); j++) {
                                 Room temp_room = world.rooms.get(j);
                                 if (((temp.x == temp_room.botLeft.x || temp.x == temp_room.topRight.x)
-                                        && (temp.y >= temp_room.botLeft.y || temp.y <= temp_room.topRight.y))
+                                        && (temp.y >= temp_room.botLeft.y && temp.y <= temp_room.topRight.y))
                                         || ((temp.y == temp_room.botLeft.y || temp.y == temp_room.topRight.y)
-                                        && (temp.x <= temp_room.topRight.x
-                                        && temp.x >= temp_room.botLeft.x))) {
+                                        && (temp.x >= temp_room.botLeft.x && temp.x <= temp_room.topRight.x))) {
                                     belongsTo.add(temp_room);
                                     break;
                                 }
