@@ -30,6 +30,7 @@ public class Game {
 
     public Game() {
         ter.initialize(byog.Core.MapGenerator.WIDTH, byog.Core.MapGenerator.HEIGHT);
+        // TODO: debug -> save does not work
         gameState = new GameState();
         StdDraw.enableDoubleBuffering();
     }
