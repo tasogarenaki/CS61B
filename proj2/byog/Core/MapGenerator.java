@@ -38,10 +38,6 @@ public class MapGenerator {
     private static final int INITIAL_COMMANDS_FONT_SIZE = 30;
     private static final int HUD_FONT_SIZE = 16;
 
-
-    // TODO: Debug
-
-
     /**
      * World
      * Generate a random world map contains rooms and hallways.
@@ -125,11 +121,10 @@ public class MapGenerator {
         }
     }
 
-
     /**
-     * World generate.
+     * Randomly world generate.
      * @param rand
-     * @return
+     * @return  a random world.
      */
     public static TETile[][] generateWorld(Random rand) {
         World world = new World();
@@ -140,11 +135,12 @@ public class MapGenerator {
                 map[x][y] = Tileset.NOTHING;
             }
         }
+        /* Generate the world. */
         generateRoom(world, rand);
         generateMaze(world, rand);
         findConnects(world);
         connectRegions(world, rand);
-        removeDeadEnds(world);          // TODO: ggf. comment this line
+        removeDeadEnds(world);
         addDoorAndCharacter(world, rand);
         return world.map;
     }
@@ -163,7 +159,6 @@ public class MapGenerator {
                     Integer.min(WIDTH - 1, botLeftX + ROOMMAXLEN) / 2) + 1;
             int topRightY = 2 * RandomUtils.uniform(rand, (botLeftY + 1) / 2,
                     Integer.min(HEIGHT - 1, botLeftY + ROOMMAXLEN) / 2) + 1;
-
             /* Generate World via Coordinates. */
             Room newRoom = new Room(new Coordinate(botLeftX, botLeftY),
                     new Coordinate(topRightX, topRightY));
@@ -174,7 +169,6 @@ public class MapGenerator {
         }
         fillRoom(world);
     }
-
 
     /**
      * Check whether two rooms are overlapped.
@@ -187,6 +181,7 @@ public class MapGenerator {
             Room curRoom = world.rooms.get(i);
             boolean res;
 
+            /* Verify if two rooms share the same boundary. */
             res = !(newRoom.topRight.x + 1 < curRoom.botLeft.x
                     || newRoom.topRight.y + 1 < curRoom.botLeft.y
                     || newRoom.botLeft.x - 1 > curRoom.topRight.x
@@ -216,19 +211,18 @@ public class MapGenerator {
         for (int i = 0; i < world.rooms.size(); i++) {
             Room curRoom = world.rooms.get(i);
 
-            /* Floors */
+            /* Floor tiles within the room. */
             for (int x = curRoom.botLeft.x; x <= curRoom.topRight.x; x++) {
                 for (int y = curRoom.botLeft.y; y <= curRoom.topRight.y; y++) {
                     world.map[x][y] = Tileset.FLOOR;
                 }
             }
 
-            /* Walls */
+            /* Walls encircle the room. */
             for (int x = curRoom.botLeft.x - 1; x <= curRoom.topRight.x + 1; x++) {
                 world.map[x][curRoom.botLeft.y - 1] = Tileset.WALL;
                 world.map[x][curRoom.topRight.y + 1] = Tileset.WALL;
             }
-
             for (int y = curRoom.botLeft.y ; y <= curRoom.topRight.y; y++) {
                 world.map[curRoom.botLeft.x - 1][y] = Tileset.WALL;
                 world.map[curRoom.topRight.x + 1][y] = Tileset.WALL;
@@ -279,23 +273,24 @@ public class MapGenerator {
         hallway.coors.add(coord);
         worldMap[x][y] = Tileset.FLOOR;
 
+        /* Flood Fill Algorithm. */
         while(!stack.isEmpty()) {
             int dir;
             List<Integer> avblDir = new ArrayList<>();
             coord = stack.getLast();
 
             for (int i = 0; i < 4; i++) {
-                //Coordinate firstCoord = applyDir(i, 1, coord);
-                Coordinate secondCoord = applyDir(i, 2, coord);
+                //Coordinate firstCoord = applyDir(i, 1, coord);    // TODO:
+                Coordinate two_steps = applyDir(i, 2, coord);
 
                 /* Unavailable Coordinate.*/
-                if (secondCoord.x <= 0 || secondCoord.x >= WIDTH -1
-                        || secondCoord.y <= 0 || secondCoord.y >= HEIGHT -1) {
+                if (two_steps.x <= 0 || two_steps.x >= WIDTH -1
+                        || two_steps.y <= 0 || two_steps.y >= HEIGHT -1) {
                     continue;
                 }
 
                 /* Available Coordinate. */
-                if (worldMap[secondCoord.x][secondCoord.y].equals(Tileset.NOTHING)) {
+                if (worldMap[two_steps.x][two_steps.y].equals(Tileset.NOTHING)) {
                     avblDir.add(i);
                 }
             }
@@ -307,18 +302,17 @@ public class MapGenerator {
                     dir = avblDir.get(RandomUtils.uniform(rand, avblDir.size()));
                 }
 
+                Coordinate one_step = applyDir(dir, 1, coord);
+                Coordinate two_steps = applyDir(dir, 2, coord);
+                worldMap[one_step.x][one_step.y] = Tileset.FLOOR;
+                worldMap[two_steps.x][two_steps.y] = Tileset.FLOOR;
+                stack.addLast(two_steps);
 
-                Coordinate firstCoord = applyDir(dir, 1, coord);
-                Coordinate secondCoord = applyDir(dir, 2, coord);
-                worldMap[firstCoord.x][firstCoord.y] = Tileset.FLOOR;
-                worldMap[secondCoord.x][secondCoord.y] = Tileset.FLOOR;
-                stack.addLast(secondCoord);
-
-                if (!hallway.coors.contains(firstCoord)) {
-                    hallway.coors.add(firstCoord);
+                if (!hallway.coors.contains(one_step)) {
+                    hallway.coors.add(one_step);
                 }
-                if (!hallway.coors.contains(secondCoord)) {
-                    hallway.coors.add(secondCoord);
+                if (!hallway.coors.contains(two_steps)) {
+                    hallway.coors.add(two_steps);
                 }
                 lastDir = dir;
             } else {
