@@ -8,6 +8,7 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 import byog.lab6.MemoryGame;
 
+import java.security.Key;
 import java.text.StringCharacterIterator;
 
 import edu.princeton.cs.algs4.ST;
@@ -199,14 +200,6 @@ public class Game {
                     player = getPlayer();
                     ter.renderFrame(gameState.world);
 
-
-
-
-
-
-
-
-
                 } else if (command == Keys.LOAD_GAME) {
 
 
@@ -231,9 +224,8 @@ public class Game {
                 state = States.GAME;
 
 
-
             } else if (state == States.GAME) {
-                // TODO: directions
+                // TODO: directions - can not move with keyboard
                 renderHUD();
                 command = readKey();
                 switch (command) {
@@ -255,10 +247,8 @@ public class Game {
                         break;
                     default:
                         break;
-
                 }
             }
-
         }
 
 
