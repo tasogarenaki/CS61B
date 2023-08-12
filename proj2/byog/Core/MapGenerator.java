@@ -280,7 +280,7 @@ public class MapGenerator {
             coord = stack.getLast();
 
             for (int i = 0; i < 4; i++) {
-                //Coordinate firstCoord = applyDir(i, 1, coord);    // TODO:
+                //Coordinate firstCoord = applyDir(i, 1, coord);    // TODO: delete this
                 Coordinate two_steps = applyDir(i, 2, coord);
 
                 /* Unavailable Coordinate.*/
@@ -578,15 +578,7 @@ public class MapGenerator {
 
 
 
-    protected static void displayMessage(String message) {
-        Font font = StdDraw.getFont();
-        StdDraw.clear(StdDraw.BLACK);
-        StdDraw.setPenColor(Color.WHITE);
-        StdDraw.setFont(font.deriveFont(Font.BOLD, TITLE_FONT_SIZE));
-        StdDraw.text(WIDTH / 2, HEIGHT / 2, message);
-        StdDraw.setFont(font);
-        StdDraw.show();
-    }
+
 
 
 

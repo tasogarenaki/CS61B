@@ -17,19 +17,42 @@ import javax.swing.plaf.nimbus.State;
 import java.util.Map;
 import java.util.Random;
 
+
+
+
 public class Game {
-    /* Game modes */
-    private static final int STRINGMODE = 0;
-    private static final int KEYBOARDMODE = 1;
+    /* Game Menu Properties. */
+    private static final String TITLE = "CS61B: THE GAME";
+    private static final String INITIAL_COMMAND_NEW_GAME = "New Game (N)";
+    private static final String INITIAL_COMMAND_LOAD_GAME = "Load Game (L)";
+    private static final String INITIAL_COMMAND_QUIT = "Quit(Q)";
+    private static final String SAVE_GAME = "SAVE GAME? (Y/N)";
+    private static final String QUITE = "QUITTING...";
+
+    /* */
+    private static final int WINDOW_WIDTH = (MapGenerator.WIDTH - 1) / 2;
+    private static final int WINDOW_HEIGHT = MapGenerator.HEIGHT - 6;
+    private static final int DISPLAY_WIDTH = MapGenerator.WIDTH;
+    private static final int DISPLAY_HEIGHT = MapGenerator.HEIGHT + 1;
+    private static final int VERTICAL_SEPARATION = 5;
+    private static final int TITLE_FONT_SIZE = 70;
+    private static final int INITIAL_COMMANDS_FONT_SIZE = 50;
+    private static final int HUD_FONT_SIZE = 15;
+    private static final int ENVIRONMENT_SIZE = 15;
 
     /* Game Properties. */
     private long seed;
     private GameState gameState;
     private MapGenerator.Coordinate player;
+    private enum States {COMMAND, GAME};
+    private States state;
+
     TERenderer ter = new TERenderer();
 
+
+
     public Game() {
-        ter.initialize(byog.Core.MapGenerator.WIDTH, byog.Core.MapGenerator.HEIGHT);
+        ter.initialize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
         // TODO: debug -> save does not work
         gameState = new GameState();
         StdDraw.enableDoubleBuffering();
@@ -40,6 +63,14 @@ public class Game {
      */
     public void playWithKeyboard() {
         // TODO: for keyboard
+        String first_command = "" + Keys.NEW_GAME + Keys.LOAD_GAME + Keys.QUIT_SAVE;
+        char command = 0;
+        while (first_command.indexOf(command) == -1) {
+            displayMenu();
+            command = readKey();
+            state = States.COMMAND;
+        }
+        processKey(command);
     }
 
     /**
@@ -55,74 +86,39 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
-        processChar(input, STRINGMODE);
+        processChar(input);
         return gameState.world;
     }
 
-    private void displayMenu() {
-        StdDraw.setPenColor(StdDraw.WHITE);
-        Font font1 = new Font("Sans Serif", Font.PLAIN, 70);
-        Font font2 = new Font("Sans Serif", Font.PLAIN, 50);
-        StdDraw.setFont(font1);
-        StdDraw.text(40, 25, "CS61B: THE GAME");
-        StdDraw.setFont(font2);
-        StdDraw.text(40, 20, "New Game (N)");
-        StdDraw.text(40, 15, "Load Game (L)");
-        StdDraw.text(40, 10, "Quit (Q)");
-        StdDraw.show();
-    }
-
     /**
-     * Process commands.
+     * Process commands with string.
      * @param input the String to be processed.
-     * @param mode  the mode of the game.
      */
-    private void processChar(String input, int mode) {
+    private void processChar(String input) {
         /* Uses iterator to process every char of input. */
         StringCharacterIterator it = new StringCharacterIterator(input.toUpperCase());
         char c;
-
         while (it.current() != StringCharacterIterator.DONE) {
             c = it.current();
             switch (c) {
+                /* Game States. */
                 case Keys.NEW_GAME:
-                    if (mode == KEYBOARDMODE) {
-                        // TODO: for keyboard
-                    }
                     seed = 0;
                     break;
-
                 case Keys.LOAD_GAME:
                     gameState = GameState.loadWorld();
                     player = getPlayer();
                     break;
-
                 /* Save and Quite via String. */
                 case Keys.PRE_QUIT_SAVE:
-                    if (mode == STRINGMODE) {
-                        if (it.next() == Keys.QUIT_SAVE) {
-                            GameState.saveWorld(gameState);
-                            System.exit(0);
-                            break;
-                        }
+                    if (it.next() == Keys.QUIT_SAVE) {
+                        GameState.saveWorld(gameState);
+                        System.exit(0);
+                        break;
                     }
                     break;
-
                 /* Quite via Keyboard. */
                 case Keys.QUIT_SAVE:
-                    if (mode == KEYBOARDMODE) {
-                        MapGenerator.displayMessage("SAVE GAME? (Y/N)");
-                        while (true) {
-                            if (it.next() == Keys.YES) {
-                                GameState.saveWorld(gameState);
-                                System.exit(0);
-                                break;
-                            } else if (it.next() == Keys.NO) {
-                                System.exit(0);
-                                break;
-                            }
-                        }
-                    }
                     /* Quite via string without save the game. */
                     System.exit(0);
                     break;
@@ -144,11 +140,7 @@ public class Game {
                 /* Set the seeds. */
                 default:
                     if(Character.isDigit(c)) {
-                        // TODO: for keyboard
-                        if (mode == KEYBOARDMODE) { }
-
                         seed = seed * 10 + c - '0';     // Note that c is a char digit, e.g. '1' - '0' = 49 - 48 = 1
-
                         /* seed: #####S, after 'S' should all seeds set to the world. */
                         if (it.next() == Keys.DOWN) {
                             gameState.rand = new Random(seed);
@@ -163,6 +155,168 @@ public class Game {
             it.next();
         }
     }
+
+
+    private void processKey(char command) {
+        while (true) {
+            if (state == States.COMMAND) {
+                // TODO: L
+                if (command == Keys.NEW_GAME) {
+                    /* Read seed. */
+                    Long seed = null;
+                    while (true) {
+                        displayMessage("ENTER SEED");
+                        String temp = "";
+                        while (true) {
+                            char key = readKey();
+                            if (key == 0) {
+                                continue;
+                            } else if (key == '\n') {
+                                break;
+                            }
+                            temp = temp + key;
+                            displayMessage("SEED: " + temp);
+                        }
+
+                        try {
+                            seed = Long.parseLong(temp);
+                        } catch (NumberFormatException e) {
+                            seed = null;
+                        }
+
+                        if (seed != null) {
+                            break;
+                        } else {
+                            displayMessage("INVALID SEED");
+                            StdDraw.pause(1000);
+                        }
+                    }
+
+                    Font font = new Font("Sans Serif", Font.PLAIN, ENVIRONMENT_SIZE);
+                    StdDraw.setFont(font);
+                    gameState.rand = new Random(seed);
+                    gameState.world = MapGenerator.generateWorld(gameState.rand);
+                    player = getPlayer();
+                    ter.renderFrame(gameState.world);
+
+
+
+
+
+
+
+
+
+                } else if (command == Keys.LOAD_GAME) {
+
+
+
+
+                } else {
+                    displayMessage(SAVE_GAME);
+                    while (true) {
+                        command = readKey();
+                        if (command == Keys.YES) {
+                            GameState.saveWorld(gameState);
+                            displayMessage(QUITE);
+                            System.exit(0);
+                            break;
+                        } else if (command == Keys.NO) {
+                            displayMessage(QUITE);
+                            System.exit(0);
+                            break;
+                        }
+                    }
+                }
+                state = States.GAME;
+
+
+
+            } else if (state == States.GAME) {
+                // TODO: directions
+                renderHUD();
+                command = readKey();
+                switch (command) {
+                    /* Move the player. */
+                    case Keys.UP:
+                        movePlayer(MapGenerator.NORTH);
+                        break;
+                    case Keys.DOWN:
+                        movePlayer(MapGenerator.SOUTH);
+                        break;
+                    case Keys.LEFT:
+                        movePlayer(MapGenerator.WEST);
+                        break;
+                    case Keys.RIGHT:
+                        movePlayer(MapGenerator.EAST);
+                        break;
+                    case Keys.QUIT_SAVE:
+                        state = States.COMMAND;
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+
+        }
+
+
+
+
+
+
+        /*
+        if (state == States.COMMAND) {
+            // TODO: N, L, Q
+            if (command == Keys.NEW_GAME) {
+                // TODO: seed
+
+            }
+            state = States.GAME;
+        } else if (state == States.GAME) {
+            // TODO: directions
+            while (command != Keys.QUIT_SAVE) {
+                renderHUD();
+                command = readKey();
+                switch (command) {
+
+                    case Keys.UP:
+                        movePlayer(MapGenerator.NORTH);
+                        break;
+                    case Keys.DOWN:
+                        movePlayer(MapGenerator.SOUTH);
+                        break;
+                    case Keys.LEFT:
+                        movePlayer(MapGenerator.WEST);
+                        break;
+                    case Keys.RIGHT:
+                        movePlayer(MapGenerator.EAST);
+                        break;
+                    case Keys.QUIT_SAVE:
+                        displayMessage(SAVE_GAME);
+                        while (true) {
+                            command = readKey();
+                        }
+
+
+                    default:
+                        break;
+
+                }
+
+
+
+            }
+
+        }
+         */
+
+
+
+    }
+
+
 
     /**
      * Find the player and return it.
@@ -191,6 +345,69 @@ public class Game {
             gameState.world[new_coord.x][new_coord.y] = Tileset.PLAYER;
         }
     }
+
+    /**
+     * Capture a key input from the user via the keyboard.
+     * @return a single character read from the keyboard, or 0 if no key was detected.
+     */
+    private char readKey() {
+        return StdDraw.hasNextKeyTyped()
+                ? java.lang.Character.toUpperCase(StdDraw.nextKeyTyped())
+                : 0;
+    }
+
+    /**
+     * Show the initial menu when playing with a keyboard.
+     */
+    private void displayMenu() {
+        StdDraw.setPenColor(StdDraw.WHITE);
+        Font font_size = new Font("Sans Serif", Font.PLAIN, TITLE_FONT_SIZE);
+        Font commands_size = new Font("Sans Serif", Font.PLAIN, INITIAL_COMMANDS_FONT_SIZE);
+        StdDraw.setFont(font_size);
+        StdDraw.text(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE);
+        StdDraw.setFont(commands_size);
+        StdDraw.text(WINDOW_WIDTH, WINDOW_HEIGHT - VERTICAL_SEPARATION, INITIAL_COMMAND_NEW_GAME);
+        StdDraw.text(WINDOW_WIDTH, WINDOW_HEIGHT - VERTICAL_SEPARATION * 2, INITIAL_COMMAND_LOAD_GAME);
+        StdDraw.text(WINDOW_WIDTH, WINDOW_HEIGHT - VERTICAL_SEPARATION * 3, INITIAL_COMMAND_QUIT);
+        StdDraw.show();
+    }
+
+    private void renderHUD() {
+        int mouseX = (int) StdDraw.mouseX();
+        int mouseY = (int) StdDraw.mouseY();
+        String desc = null;
+
+        if (mouseY<DISPLAY_HEIGHT) {
+            desc = gameState.world[mouseX][mouseY].description();
+        }
+        Font font = StdDraw.getFont();
+        StdDraw.setPenColor(StdDraw.WHITE);
+        StdDraw.setFont(font.deriveFont(Font.BOLD, HUD_FONT_SIZE));
+        try {
+            StdDraw.textLeft(2, DISPLAY_HEIGHT - 0.5, desc);
+        } catch (NullPointerException e) {
+            System.out.print("NullPointerException caught");
+        }
+
+        StdDraw.show();
+        //StdDraw.pause(10);
+
+    }
+
+
+
+    private void displayMessage(String message) {
+        Font font = StdDraw.getFont();
+        StdDraw.clear(StdDraw.BLACK);
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.setFont(font.deriveFont(Font.BOLD, TITLE_FONT_SIZE));
+        //StdDraw.text(MapGenerator.WIDTH / 2, MapGenerator.HEIGHT / 2, message);
+        StdDraw.text(DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2, message);
+        StdDraw.setFont(font);
+        StdDraw.show();
+    }
+
+
 
 
 

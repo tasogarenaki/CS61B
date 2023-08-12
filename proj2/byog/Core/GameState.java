@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+/**
+ * GameState
+ * To save and load, to disk, the state of a game.
+ */
 public class GameState implements Serializable {
     private static final long serialVersionUID = 123123123123123L;
 
