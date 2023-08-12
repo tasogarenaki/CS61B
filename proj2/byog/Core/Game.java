@@ -160,8 +160,8 @@ public class Game {
 
     private void processKey(char command) {
         while (true) {
+            /* Game States: Start, Load, Quite the game. */
             if (state == States.COMMAND) {
-                // TODO: L
                 if (command == Keys.NEW_GAME) {
                     /* Read seed. */
                     Long seed = null;
@@ -179,12 +179,12 @@ public class Game {
                             displayMessage("SEED: " + temp);
                         }
 
+                        /* Check whether the seed is valid. */
                         try {
                             seed = Long.parseLong(temp);
                         } catch (NumberFormatException e) {
                             seed = null;
                         }
-
                         if (seed != null) {
                             break;
                         } else {
@@ -193,13 +193,16 @@ public class Game {
                         }
                     }
 
+                    /* Define the size of the game environment. */
                     Font font = new Font("Sans Serif", Font.PLAIN, ENVIRONMENT_SIZE);
                     StdDraw.setFont(font);
+
+                    /* Configure the game properties. */
                     gameState.rand = new Random(seed);
                     gameState.world = MapGenerator.generateWorld(gameState.rand);
                     player = getPlayer();
-                    ter.renderFrame(gameState.world);
 
+                // TODO: L
                 } else if (command == Keys.LOAD_GAME) {
 
 
@@ -223,9 +226,9 @@ public class Game {
                 }
                 state = States.GAME;
 
-
+            /* Play the game. */
             } else if (state == States.GAME) {
-                // TODO: directions - can not move with keyboard
+                ter.renderFrame(gameState.world);
                 renderHUD();
                 command = readKey();
                 switch (command) {
@@ -250,60 +253,6 @@ public class Game {
                 }
             }
         }
-
-
-
-
-
-
-        /*
-        if (state == States.COMMAND) {
-            // TODO: N, L, Q
-            if (command == Keys.NEW_GAME) {
-                // TODO: seed
-
-            }
-            state = States.GAME;
-        } else if (state == States.GAME) {
-            // TODO: directions
-            while (command != Keys.QUIT_SAVE) {
-                renderHUD();
-                command = readKey();
-                switch (command) {
-
-                    case Keys.UP:
-                        movePlayer(MapGenerator.NORTH);
-                        break;
-                    case Keys.DOWN:
-                        movePlayer(MapGenerator.SOUTH);
-                        break;
-                    case Keys.LEFT:
-                        movePlayer(MapGenerator.WEST);
-                        break;
-                    case Keys.RIGHT:
-                        movePlayer(MapGenerator.EAST);
-                        break;
-                    case Keys.QUIT_SAVE:
-                        displayMessage(SAVE_GAME);
-                        while (true) {
-                            command = readKey();
-                        }
-
-
-                    default:
-                        break;
-
-                }
-
-
-
-            }
-
-        }
-         */
-
-
-
     }
 
 
@@ -366,6 +315,7 @@ public class Game {
         int mouseX = (int) StdDraw.mouseX();
         int mouseY = (int) StdDraw.mouseY();
 
+        /* A bug may occur if the mouse is outside the range of the world. */
         if (mouseX < MapGenerator.WIDTH && mouseY < MapGenerator.HEIGHT) {
             String desc = gameState.world[mouseX][mouseY].description();
             Font font = StdDraw.getFont();
@@ -373,7 +323,6 @@ public class Game {
             StdDraw.setFont(font.deriveFont(Font.BOLD, HUD_FONT_SIZE));
             StdDraw.textLeft(2, DISPLAY_HEIGHT - 1, desc);
             StdDraw.show();
-            //StdDraw.pause(10);
         }
     }
 
@@ -384,7 +333,6 @@ public class Game {
         StdDraw.clear(StdDraw.BLACK);
         StdDraw.setPenColor(Color.WHITE);
         StdDraw.setFont(font.deriveFont(Font.BOLD, TITLE_FONT_SIZE));
-        //StdDraw.text(MapGenerator.WIDTH / 2, MapGenerator.HEIGHT / 2, message);
         StdDraw.text(DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2, message);
         StdDraw.setFont(font);
         StdDraw.show();
