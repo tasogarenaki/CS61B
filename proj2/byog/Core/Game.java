@@ -33,7 +33,7 @@ public class Game {
     private static final int WINDOW_WIDTH = (MapGenerator.WIDTH - 1) / 2;
     private static final int WINDOW_HEIGHT = MapGenerator.HEIGHT - 6;
     private static final int DISPLAY_WIDTH = MapGenerator.WIDTH;
-    private static final int DISPLAY_HEIGHT = MapGenerator.HEIGHT + 1;
+    private static final int DISPLAY_HEIGHT = MapGenerator.HEIGHT + 2;
     private static final int VERTICAL_SEPARATION = 5;
     private static final int TITLE_FONT_SIZE = 70;
     private static final int INITIAL_COMMANDS_FONT_SIZE = 50;
@@ -375,23 +375,16 @@ public class Game {
     private void renderHUD() {
         int mouseX = (int) StdDraw.mouseX();
         int mouseY = (int) StdDraw.mouseY();
-        String desc = null;
 
-        if (mouseY<DISPLAY_HEIGHT) {
-            desc = gameState.world[mouseX][mouseY].description();
+        if (mouseX < MapGenerator.WIDTH && mouseY < MapGenerator.HEIGHT) {
+            String desc = gameState.world[mouseX][mouseY].description();
+            Font font = StdDraw.getFont();
+            StdDraw.setPenColor(StdDraw.WHITE);
+            StdDraw.setFont(font.deriveFont(Font.BOLD, HUD_FONT_SIZE));
+            StdDraw.textLeft(2, DISPLAY_HEIGHT - 1, desc);
+            StdDraw.show();
+            //StdDraw.pause(10);
         }
-        Font font = StdDraw.getFont();
-        StdDraw.setPenColor(StdDraw.WHITE);
-        StdDraw.setFont(font.deriveFont(Font.BOLD, HUD_FONT_SIZE));
-        try {
-            StdDraw.textLeft(2, DISPLAY_HEIGHT - 0.5, desc);
-        } catch (NullPointerException e) {
-            System.out.print("NullPointerException caught");
-        }
-
-        StdDraw.show();
-        //StdDraw.pause(10);
-
     }
 
 
