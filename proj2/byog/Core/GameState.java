@@ -1,6 +1,9 @@
 package byog.Core;
 
 import byog.TileEngine.TETile;
+import byog.lab5.HexWorld;
+
+import java.util.List;
 import java.io.Serializable;
 import java.util.Random;
 import java.io.File;
@@ -21,9 +24,10 @@ public class GameState implements Serializable {
     /* File to save the game state. */
     private static final String PATH = "./game.txt";
 
+    private MapGenerator.Coordinate finalPlayer;
+
     public TETile[][] world;
     public Random rand;
-
 
     public GameState() {
         world = null;
@@ -69,6 +73,7 @@ public class GameState implements Serializable {
      * @param gameState the instance of GameState to be saved.
      */
     public static void saveWorld(GameState gameState) {
+        gameState.world = null;
         File f = new File(PATH);
         try {
             if (!f.exists()) {
@@ -86,4 +91,14 @@ public class GameState implements Serializable {
             System.exit(0);
         }
     }
+
+
+    public void setState(TETile[][] world, Random rand, MapGenerator.Coordinate finalPlayer) {
+        this.world = world;
+        this.rand = rand;
+        this.finalPlayer = finalPlayer;
+    }
+
+    public void setWorld(TETile[][] world) {}
+
 }

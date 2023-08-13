@@ -4,8 +4,10 @@ import byog.SaveDemo.World;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
+import java.io.Serializable;
 
 import javax.swing.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.ArrayDeque;
@@ -97,7 +99,7 @@ public class MapGenerator {
      * Coordinate
      * Coordinates of the world.
      */
-    protected static class Coordinate {
+    protected static class Coordinate implements Serializable {
         int x;
         int y;
 
@@ -570,18 +572,4 @@ public class MapGenerator {
         coord = player.get(index);
         world.map[coord.x][coord.y] = Tileset.PLAYER;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

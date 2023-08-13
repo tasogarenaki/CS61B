@@ -88,6 +88,8 @@ public class Game {
      */
     public TETile[][] playWithInputString(String input) {
         processChar(input);
+        // THIS LINE IS ONLY REMOVED TO BE ABLE TO RUN WITH THE AUTOGRADER
+        //ter.renderFrame(gameState.world);
         return gameState.world;
     }
 
@@ -213,12 +215,20 @@ public class Game {
                     while (true) {
                         command = readKey();
                         if (command == Keys.YES) {
-                            GameState.saveWorld(gameState);
+                            if (gameState.world != null) {
+                                gameState.setState(gameState.world, gameState.rand, getPlayer());
+                                GameState.saveWorld(gameState);
+                            } else {
+                                displayMessage("There's no world to save.");
+                                StdDraw.pause(1000);
+                            }
                             displayMessage(QUITE);
+                            StdDraw.pause(1000);
                             System.exit(0);
                             break;
                         } else if (command == Keys.NO) {
                             displayMessage(QUITE);
+                            StdDraw.pause(1000);
                             System.exit(0);
                             break;
                         }
