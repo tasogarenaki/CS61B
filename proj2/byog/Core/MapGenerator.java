@@ -99,7 +99,8 @@ public class MapGenerator {
      * Coordinate
      * Coordinates of the world.
      */
-    protected static class Coordinate implements Serializable {
+    //protected static class Coordinate implements Serializable {
+    protected static class Coordinate {
         int x;
         int y;
 

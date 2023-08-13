@@ -8,6 +8,7 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 import byog.lab6.MemoryGame;
 
+import java.io.Serializable;
 import java.security.Key;
 import java.text.StringCharacterIterator;
 
@@ -17,7 +18,6 @@ import edu.princeton.cs.introcs.StdDraw;
 import javax.swing.plaf.nimbus.State;
 import java.util.Map;
 import java.util.Random;
-
 
 
 
@@ -54,7 +54,6 @@ public class Game {
 
     public Game() {
         ter.initialize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
-        // TODO: debug -> save does not work
         gameState = new GameState();
         StdDraw.enableDoubleBuffering();
     }
@@ -63,7 +62,6 @@ public class Game {
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
-        // TODO: for keyboard
         String first_command = "" + Keys.NEW_GAME + Keys.LOAD_GAME + Keys.QUIT_SAVE;
         char command = 0;
         while (first_command.indexOf(command) == -1) {
@@ -204,22 +202,31 @@ public class Game {
                     gameState.world = MapGenerator.generateWorld(gameState.rand);
                     player = getPlayer();
 
-                // TODO: L
                 } else if (command == Keys.LOAD_GAME) {
-
-
-
-
+                    if ((gameState = GameState.loadWorld()) == null) {
+                        displayMessage("There's no saved game.");
+                        StdDraw.pause(1000);
+                        displayMessage(QUITE);
+                        StdDraw.pause(1000);
+                        System.exit(0);
+                    } else {
+                        // TODO: potential bug
+                        gameState = GameState.loadWorld();
+                        player = getPlayer();
+                        //gameState.setWorld(gameState.world, player);
+                    }
                 } else {
                     displayMessage(SAVE_GAME);
                     while (true) {
                         command = readKey();
                         if (command == Keys.YES) {
+                            /* Trying to save a null world will cause an error. */
                             if (gameState.world != null) {
-                                gameState.setState(gameState.world, gameState.rand, getPlayer());
+                                // TODO: debug
+                                //gameState.setState(gameState.world, getPlayer());
                                 GameState.saveWorld(gameState);
                             } else {
-                                displayMessage("There's no world to save.");
+                                displayMessage("There's no game to save.");
                                 StdDraw.pause(1000);
                             }
                             displayMessage(QUITE);

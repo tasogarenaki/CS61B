@@ -19,12 +19,12 @@ import java.io.ObjectOutputStream;
  * To save and load, to disk, the state of a game.
  */
 public class GameState implements Serializable {
-    private static final long serialVersionUID = 123123123123123L;
+    private static final long serialVersionUID = 1L;
 
     /* File to save the game state. */
     private static final String PATH = "./game.txt";
 
-    private MapGenerator.Coordinate finalPlayer;
+    //public MapGenerator.Coordinate player;
 
     public TETile[][] world;
     public Random rand;
@@ -32,6 +32,7 @@ public class GameState implements Serializable {
     public GameState() {
         world = null;
         rand = null;
+        //player = null;
     }
 
     public GameState(TETile[][] world, Random rand) {
@@ -73,7 +74,7 @@ public class GameState implements Serializable {
      * @param gameState the instance of GameState to be saved.
      */
     public static void saveWorld(GameState gameState) {
-        gameState.world = null;
+        //gameState.world = null;     // TODO: potential bug
         File f = new File(PATH);
         try {
             if (!f.exists()) {
@@ -92,13 +93,16 @@ public class GameState implements Serializable {
         }
     }
 
-
-    public void setState(TETile[][] world, Random rand, MapGenerator.Coordinate finalPlayer) {
+    /*
+    public void setState(TETile[][] world, MapGenerator.Coordinate player) {
         this.world = world;
-        this.rand = rand;
-        this.finalPlayer = finalPlayer;
+        this.player = player;
     }
 
-    public void setWorld(TETile[][] world) {}
+    public void setWorld(TETile[][] world, MapGenerator.Coordinate player) {
+        this.world = world;
+        this.player = player;
+    }
+     */
 
 }
