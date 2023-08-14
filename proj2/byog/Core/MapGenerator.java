@@ -283,7 +283,6 @@ public class MapGenerator {
             coord = stack.getLast();
 
             for (int i = 0; i < 4; i++) {
-                //Coordinate firstCoord = applyDir(i, 1, coord);    // TODO: delete this
                 Coordinate two_steps = applyDir(i, 2, coord);
 
                 /* Unavailable Coordinate.*/

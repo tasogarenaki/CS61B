@@ -6,23 +6,18 @@ import java.awt.Color;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
-import byog.lab6.MemoryGame;
 
-import java.io.Serializable;
-import java.security.Key;
 import java.text.StringCharacterIterator;
-
-import edu.princeton.cs.algs4.ST;
 import edu.princeton.cs.introcs.StdDraw;
-
-import javax.swing.plaf.nimbus.State;
-import java.util.Map;
 import java.util.Random;
 
-
-
+/**
+ * Game.
+ * The main methods of playing the game.
+ * @author Terry
+ */
 public class Game {
-    /* Game Menu Properties. */
+    /* Properties of the Game Menu. */
     private static final String TITLE = "CS61B: THE GAME";
     private static final String INITIAL_COMMAND_NEW_GAME = "New Game (N)";
     private static final String INITIAL_COMMAND_LOAD_GAME = "Load Game (L)";
@@ -87,7 +82,7 @@ public class Game {
     public TETile[][] playWithInputString(String input) {
         processChar(input);
         // THIS LINE IS ONLY REMOVED TO BE ABLE TO RUN WITH THE AUTOGRADER
-        //ter.renderFrame(gameState.world);
+        ter.renderFrame(gameState.world);
         return gameState.world;
     }
 
@@ -210,10 +205,8 @@ public class Game {
                         StdDraw.pause(1000);
                         System.exit(0);
                     } else {
-                        // TODO: potential bug
                         gameState = GameState.loadWorld();
                         player = getPlayer();
-                        //gameState.setWorld(gameState.world, player);
                     }
                 } else {
                     displayMessage(SAVE_GAME);
@@ -222,8 +215,6 @@ public class Game {
                         if (command == Keys.YES) {
                             /* Trying to save a null world will cause an error. */
                             if (gameState.world != null) {
-                                // TODO: debug
-                                //gameState.setState(gameState.world, getPlayer());
                                 GameState.saveWorld(gameState);
                             } else {
                                 displayMessage("There's no game to save.");
