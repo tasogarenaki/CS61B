@@ -1,14 +1,14 @@
 package byog.Core;
 
 /**
- * Keys that are used to play the game.
- * Note: Here only contains uppercase, but as requested,
- * there should be no difference between i.e. 'n' or 'N'.
- * This will be normalized in Game.java.
+ * Keys used to play the game.
+ * Note: Here, only uppercase letters are listed, but as requested,
+ * there should be no distinction between, for example, 'n' or 'N'.
+ * This normalization will be implemented in Game.java.
  * @author Terry
  */
 public class Keys {
-    /* Game control keys. */
+    /* Game Control Keys. */
     public static final char NEW_GAME = 'N';
     public static final char LOAD_GAME = 'L';
     public static final char PRE_QUIT_SAVE = ':';

@@ -25,7 +25,7 @@ public class Game {
     private static final String SAVE_GAME = "SAVE GAME? (Y/N)";
     private static final String QUITE = "QUITTING...";
 
-    /* */
+    /* Properties of Window and Font Sizes. */
     private static final int WINDOW_WIDTH = (MapGenerator.WIDTH - 1) / 2;
     private static final int WINDOW_HEIGHT = MapGenerator.HEIGHT - 6;
     private static final int DISPLAY_WIDTH = MapGenerator.WIDTH;
@@ -36,15 +36,13 @@ public class Game {
     private static final int HUD_FONT_SIZE = 15;
     private static final int ENVIRONMENT_SIZE = 15;
 
-    /* Game Properties. */
+    /* Properties of Game States. */
     private long seed;
     private GameState gameState;
     private MapGenerator.Coordinate player;
-    private enum States {COMMAND, GAME};
+    private enum States {COMMAND, GAME}
     private States state;
-
     TERenderer ter = new TERenderer();
-
 
 
     public Game() {
@@ -82,7 +80,7 @@ public class Game {
     public TETile[][] playWithInputString(String input) {
         processChar(input);
         // THIS LINE IS ONLY REMOVED TO BE ABLE TO RUN WITH THE AUTOGRADER
-        ter.renderFrame(gameState.world);
+        //ter.renderFrame(gameState.world);
         return gameState.world;
     }
 
@@ -97,15 +95,16 @@ public class Game {
         while (it.current() != StringCharacterIterator.DONE) {
             c = it.current();
             switch (c) {
-                /* Game States. */
+                /* Start a New Game. */
                 case Keys.NEW_GAME:
                     seed = 0;
                     break;
+                /* Load a Saved Game. */
                 case Keys.LOAD_GAME:
                     gameState = GameState.loadWorld();
                     player = getPlayer();
                     break;
-                /* Save and Quite via String. */
+                /* Save and Quit. */
                 case Keys.PRE_QUIT_SAVE:
                     if (it.next() == Keys.QUIT_SAVE) {
                         GameState.saveWorld(gameState);
@@ -113,13 +112,12 @@ public class Game {
                         break;
                     }
                     break;
-                /* Quite via Keyboard. */
+                /* Quit without Saving. */
                 case Keys.QUIT_SAVE:
-                    /* Quite via string without save the game. */
                     System.exit(0);
                     break;
 
-                /* Move the player. */
+                /* Move the Player. */
                 case Keys.UP:
                     movePlayer(MapGenerator.NORTH);
                     break;
@@ -133,11 +131,11 @@ public class Game {
                     movePlayer(MapGenerator.EAST);
                     break;
 
-                /* Set the seeds. */
+                /* Set the Seeds. */
                 default:
                     if(Character.isDigit(c)) {
                         seed = seed * 10 + c - '0';     // Note that c is a char digit, e.g. '1' - '0' = 49 - 48 = 1
-                        /* seed: #####S, after 'S' should all seeds set to the world. */
+                        /* Seed: #####S. After 'S', all seeds should be set to the world. */
                         if (it.next() == Keys.DOWN) {
                             gameState.rand = new Random(seed);
                             gameState.world = MapGenerator.generateWorld(gameState.rand);
@@ -152,13 +150,16 @@ public class Game {
         }
     }
 
-
+    /**
+     * Play the game using the keyboard.
+     * @param command the Key to be processed.
+     */
     private void processKey(char command) {
         while (true) {
-            /* Game States: Start, Load, Quite the game. */
+            /* Game States: Start, Load, Quit the game. */
             if (state == States.COMMAND) {
                 if (command == Keys.NEW_GAME) {
-                    /* Read seed. */
+                    /* Read Seed. */
                     Long seed = null;
                     while (true) {
                         displayMessage("ENTER SEED");
@@ -189,14 +190,13 @@ public class Game {
                     }
 
                     /* Define the size of the game environment. */
-                    Font font = new Font("Sans Serif", Font.PLAIN, ENVIRONMENT_SIZE);
+                    Font font = new Font("Times New Roman", Font.PLAIN, ENVIRONMENT_SIZE);
                     StdDraw.setFont(font);
 
                     /* Configure the game properties. */
                     gameState.rand = new Random(seed);
                     gameState.world = MapGenerator.generateWorld(gameState.rand);
                     player = getPlayer();
-
                 } else if (command == Keys.LOAD_GAME) {
                     if ((gameState = GameState.loadWorld()) == null) {
                         displayMessage("There's no saved game.");
@@ -233,14 +233,12 @@ public class Game {
                     }
                 }
                 state = States.GAME;
-
-            /* Play the game. */
+            /* Move the Player. */
             } else if (state == States.GAME) {
                 ter.renderFrame(gameState.world);
                 renderHUD();
                 command = readKey();
                 switch (command) {
-                    /* Move the player. */
                     case Keys.UP:
                         movePlayer(MapGenerator.NORTH);
                         break;
@@ -263,8 +261,6 @@ public class Game {
         }
     }
 
-
-
     /**
      * Find the player and return it.
      * @return
@@ -281,7 +277,7 @@ public class Game {
     }
 
     /**
-     * Move the Player to a new coordinate.
+     * Move the Player to a new position.
      * @param direction the direction the player should move in.
      */
     private void movePlayer(int direction) {
@@ -308,8 +304,8 @@ public class Game {
      */
     private void displayMenu() {
         StdDraw.setPenColor(StdDraw.WHITE);
-        Font font_size = new Font("Sans Serif", Font.PLAIN, TITLE_FONT_SIZE);
-        Font commands_size = new Font("Sans Serif", Font.PLAIN, INITIAL_COMMANDS_FONT_SIZE);
+        Font font_size = new Font("Times New Roman", Font.PLAIN, TITLE_FONT_SIZE);
+        Font commands_size = new Font("Times New Roman", Font.PLAIN, INITIAL_COMMANDS_FONT_SIZE);
         StdDraw.setFont(font_size);
         StdDraw.text(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE);
         StdDraw.setFont(commands_size);
@@ -319,6 +315,10 @@ public class Game {
         StdDraw.show();
     }
 
+    /**
+     * Read the current position of the mouse on the game window
+     * and set a value indicating what type of tile is below the mouse pointer.
+     */
     private void renderHUD() {
         int mouseX = (int) StdDraw.mouseX();
         int mouseY = (int) StdDraw.mouseY();
@@ -334,8 +334,10 @@ public class Game {
         }
     }
 
-
-
+    /**
+     * Display a message to the player.
+     * @param message to be displayed.
+     */
     private void displayMessage(String message) {
         Font font = StdDraw.getFont();
         StdDraw.clear(StdDraw.BLACK);
@@ -345,9 +347,4 @@ public class Game {
         StdDraw.setFont(font);
         StdDraw.show();
     }
-
-
-
-
-
 }

@@ -1,9 +1,6 @@
 package byog.Core;
 
 import byog.TileEngine.TETile;
-import byog.lab5.HexWorld;
-
-import java.util.List;
 import java.io.Serializable;
 import java.util.Random;
 import java.io.File;
@@ -16,33 +13,29 @@ import java.io.ObjectOutputStream;
 
 /**
  * GameState
- * To save and load, to disk, the state of a game.
+ * This class serves as a helper to save and load the state of a game.
+ * Note: java.io.NotSerializableException -> TileEngine.TETile should also implements Serializable
+ * @author Terry
  */
 public class GameState implements Serializable {
     private static final long serialVersionUID = 123123123123123L;
 
-    /* File to save the game state. */
+    /* File for saving the game state. */
     private static final String PATH = "./game.txt";
 
-    //public MapGenerator.Coordinate player;
-
+    /* Properties of the generated world. */
     public TETile[][] world;
     public Random rand;
+
 
     public GameState() {
         world = null;
         rand = null;
-        //player = null;
-    }
-
-    public GameState(TETile[][] world, Random rand) {
-        this.world = world;
-        this.rand = rand;
     }
 
     /**
-     * Reads the file that contains the game state.
-     * @return  a GameState instance.
+     * Reads the file containing the game state.
+     * @return a GameState instance.
      */
     public static GameState loadWorld() {
         File f = new File(PATH);
@@ -68,10 +61,8 @@ public class GameState implements Serializable {
         return null;
     }
 
-
     /**
      * Saves the game state.
-     * Note: java.io.NotSerializableException -> TileEngine.TETile should also implements Serializable
      * @param gameState the instance of GameState to be saved.
      */
     public static void saveWorld(GameState gameState) {

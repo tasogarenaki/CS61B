@@ -1,30 +1,28 @@
 package byog.Core;
 
-import byog.SaveDemo.World;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
-import edu.princeton.cs.introcs.StdDraw;
-import java.io.Serializable;
-
-import javax.swing.*;
-import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.ArrayDeque;
 import java.util.Random;
 
-import java.awt.*;
 
+/**
+ * MapGenerator
+ * A class to generate a random world consisting of rooms, hallways, and walls.
+ * @author Terry
+ */
 public class MapGenerator {
-    /* Room Structure */
+    /* Properties of the world. */
     public static final int WIDTH = 81;
     public static final int HEIGHT = 31;
     private static final int ROOMMAXLEN = 9;
-    private static final int ROOM_LIMIT = 200;   // maximum number of rooms
+    private static final int ROOM_LIMIT = 200;
     private static final int MIN_X = 0;
     private static final int MIN_Y = 0;
 
-    /* Directions */
+    /* Directions. */
     public static final int NORTH = 0;
     public static final int SOUTH = 1;
     public static final int WEST = 2;
@@ -33,12 +31,6 @@ public class MapGenerator {
     public static final int NORTHEAST = 5;
     public static final int SOUTHWEST = 6;
     public static final int SOUTHEAST = 7;
-
-
-    /* Set font size to displayed. */
-    private static final int TITLE_FONT_SIZE = 40;
-    private static final int INITIAL_COMMANDS_FONT_SIZE = 30;
-    private static final int HUD_FONT_SIZE = 16;
 
     /**
      * World
@@ -99,7 +91,6 @@ public class MapGenerator {
      * Coordinate
      * Coordinates of the world.
      */
-    //protected static class Coordinate implements Serializable {
     protected static class Coordinate {
         int x;
         int y;
@@ -143,7 +134,7 @@ public class MapGenerator {
         generateMaze(world, rand);
         findConnects(world);
         connectRegions(world, rand);
-        removeDeadEnds(world);
+        removeDeadEnds(world);      // Comment this line to generate a square world without dead ends.
         addDoorAndCharacter(world, rand);
         return world.map;
     }
@@ -162,10 +153,10 @@ public class MapGenerator {
                     Integer.min(WIDTH - 1, botLeftX + ROOMMAXLEN) / 2) + 1;
             int topRightY = 2 * RandomUtils.uniform(rand, (botLeftY + 1) / 2,
                     Integer.min(HEIGHT - 1, botLeftY + ROOMMAXLEN) / 2) + 1;
-            /* Generate World via Coordinates. */
+            /* Generate rooms using Coordinates. */
             Room newRoom = new Room(new Coordinate(botLeftX, botLeftY),
                     new Coordinate(topRightX, topRightY));
-
+            /* Rooms should not overlap. */
             if (!isRoomOverlap(world, newRoom)) {
                 world.rooms.add(newRoom);
             }
@@ -264,7 +255,7 @@ public class MapGenerator {
         int y = coord.y;
         int lastDir = RandomUtils.uniform(rand, 4);
 
-        /* Check whether it is already filled or if it is at the boundary. */
+        /* Check if it is already filled or if it is at the boundary. */
         if (worldMap[x][y].equals(Tileset.FLOOR) || worldMap[x][y].equals(Tileset.WALL)
                 || x == 0 || y == 0 || x == WIDTH - 1 || y == HEIGHT - 1) {
             return;
@@ -362,7 +353,7 @@ public class MapGenerator {
         for (int i = 0; i < hallway.coors.size(); i++) {
             Coordinate coord = hallway.coors.get(i);
             for (int j = 0; j < 8; j++) {
-                /* Neighbors in all eight directions of the current coordinates of a hallway. */
+                /* Neighbors in all eight directions of the current hallway coordinates. */
                 Coordinate coord2 = applyDir(j, 1, coord);
                 if (worldMap[coord2.x][coord2.y].equals(Tileset.NOTHING)) {
                     worldMap[coord2.x][coord2.y] = Tileset.WALL;
@@ -382,7 +373,7 @@ public class MapGenerator {
             for (int y = 1; y < HEIGHT -1 ; y++) {
                 if (world.map[x][y].equals(Tileset.WALL)) {
                     List<Coordinate> floor_coord = new ArrayList<>();
-                    /* Check whether the coordinate adjacent to the wall is a floor. */
+                    /* Check if the coordinate adjacent to the wall is a floor. */
                     for (int i = 0; i < 4; i++) {
                         Coordinate exp_coord = applyDir(i, 1, new Coordinate(x, y));
                         if (world.map[exp_coord.x][exp_coord.y].equals(Tileset.FLOOR)) {
