@@ -41,7 +41,7 @@ public class Game {
 
     /* Properties of Game States. */
     private static final int PAUSE = 1000;
-    private static final int ALLOWED_MOVE = 1000;   // steps
+    private static final int ALLOWED_MOVE = 400;   // steps
     private static final int ALLOWED_TIME = 180; // s
     private static final int TIME_CORRECT = 245;
     private long seed;
@@ -162,7 +162,7 @@ public class Game {
      * @param command the Key to be processed.
      */
     private void processKey(char command) {
-        int count = 0;
+        int step = 0;
         double time = 0;
         boolean door = false;
         while (true) {
@@ -246,7 +246,7 @@ public class Game {
             /* Move the Player. */
             } else if (state == States.GAME) {
                 ter.renderFrame(gameState.world);
-                renderHUD();
+                renderHUD(time, step);
                 command = readKey();
                 switch (command) {
                     case Keys.UP:
@@ -277,18 +277,19 @@ public class Game {
                     case Keys.DOWN:
                     case Keys.LEFT:
                     case Keys.RIGHT:
-                        count++;
+                        step++;
                 }
                 /* Check if the player finds the door. */
                 for (int i = 0; i < 4; i++) {
                     MapGenerator.Coordinate neighbour = MapGenerator.applyDir(i, 1, player);
-                    if (gameState.world[neighbour.x][neighbour.y] == Tileset.LOCKED_DOOR) {
+                    if (gameState.world[neighbour.x][neighbour.y].equals(Tileset.LOCKED_DOOR)) {
                         door = true;
                     }
                 }
+
             }
-            if (count > ALLOWED_MOVE || door || time / TIME_CORRECT > ALLOWED_TIME) {
-                String message = (count > ALLOWED_MOVE) ? MOVE_OUT : (door ? WIN : TIME_OUT);
+            if (step > ALLOWED_MOVE || door || time / TIME_CORRECT > ALLOWED_TIME) {
+                String message = (step > ALLOWED_MOVE) ? MOVE_OUT : (door ? WIN : TIME_OUT);
                 displayMessage(message);
                 StdDraw.pause(PAUSE * 2);
                 displayMessage(QUITE);
@@ -357,16 +358,22 @@ public class Game {
      * Read the current position of the mouse on the game window
      * and set a value indicating what type of tile is below the mouse pointer.
      */
-    private void renderHUD() {
+    private void renderHUD(double time, int step) {
         int mouseX = (int) StdDraw.mouseX();
         int mouseY = (int) StdDraw.mouseY();
+
+        /* Show remaining time and steps. */
+        Font font = StdDraw.getFont();
+        StdDraw.setPenColor(StdDraw.WHITE);
+        StdDraw.setFont(font.deriveFont(Font.BOLD, HUD_FONT_SIZE));
+        StdDraw.textLeft(DISPLAY_WIDTH / 2 - 2, DISPLAY_HEIGHT - 1,
+                "Time Left: " + Math.round(ALLOWED_TIME - time / TIME_CORRECT) + " s");
+        StdDraw.textLeft(DISPLAY_WIDTH - 10, DISPLAY_HEIGHT - 1, "Step Left: " + (ALLOWED_MOVE - step));
+        StdDraw.show();
 
         /* A bug may occur if the mouse is outside the range of the world. */
         if (mouseX < MapGenerator.WIDTH && mouseY < MapGenerator.HEIGHT) {
             String desc = gameState.world[mouseX][mouseY].description();
-            Font font = StdDraw.getFont();
-            StdDraw.setPenColor(StdDraw.WHITE);
-            StdDraw.setFont(font.deriveFont(Font.BOLD, HUD_FONT_SIZE));
             StdDraw.textLeft(2, DISPLAY_HEIGHT - 1, desc);
             StdDraw.show();
         }
