@@ -24,6 +24,9 @@ public class Game {
     private static final String INITIAL_COMMAND_QUIT = "Quit(Q)";
     private static final String SAVE_GAME = "SAVE GAME? (Y/N)";
     private static final String QUITE = "QUITTING...";
+    private static final String WIN = "Congratulations, you won!";
+    private static final String TIME_OUT = "Oh, time's up, you lost.";
+    private static final String MOVE_OUT = "Max moves reached, game over.";
 
     /* Properties of Window and Font Sizes. */
     private static final int WINDOW_WIDTH = (MapGenerator.WIDTH - 1) / 2;
@@ -37,6 +40,10 @@ public class Game {
     private static final int ENVIRONMENT_SIZE = 15;
 
     /* Properties of Game States. */
+    private static final int PAUSE = 1000;
+    private static final int ALLOWED_MOVE = 1000;   // steps
+    private static final int ALLOWED_TIME = 180; // s
+    private static final int TIME_CORRECT = 245;
     private long seed;
     private GameState gameState;
     private MapGenerator.Coordinate player;
@@ -155,6 +162,9 @@ public class Game {
      * @param command the Key to be processed.
      */
     private void processKey(char command) {
+        int count = 0;
+        double time = 0;
+        boolean door = false;
         while (true) {
             /* Game States: Start, Load, Quit the game. */
             if (state == States.COMMAND) {
@@ -185,7 +195,7 @@ public class Game {
                             break;
                         } else {
                             displayMessage("INVALID SEED");
-                            StdDraw.pause(1000);
+                            StdDraw.pause(PAUSE);
                         }
                     }
 
@@ -200,9 +210,9 @@ public class Game {
                 } else if (command == Keys.LOAD_GAME) {
                     if ((gameState = GameState.loadWorld()) == null) {
                         displayMessage("There's no saved game.");
-                        StdDraw.pause(1000);
+                        StdDraw.pause(PAUSE);
                         displayMessage(QUITE);
-                        StdDraw.pause(1000);
+                        StdDraw.pause(PAUSE);
                         System.exit(0);
                     } else {
                         gameState = GameState.loadWorld();
@@ -218,15 +228,15 @@ public class Game {
                                 GameState.saveWorld(gameState);
                             } else {
                                 displayMessage("There's no game to save.");
-                                StdDraw.pause(1000);
+                                StdDraw.pause(PAUSE);
                             }
                             displayMessage(QUITE);
-                            StdDraw.pause(1000);
+                            StdDraw.pause(PAUSE);
                             System.exit(0);
                             break;
                         } else if (command == Keys.NO) {
                             displayMessage(QUITE);
-                            StdDraw.pause(1000);
+                            StdDraw.pause(PAUSE);
                             System.exit(0);
                             break;
                         }
@@ -257,6 +267,34 @@ public class Game {
                     default:
                         break;
                 }
+
+                /* Gold Points: make it possible to win or lose the game; there should be three ways to do so. */
+                /* Count Time. */
+                time++;
+                /* Count Steps. */
+                switch (command) {
+                    case Keys.UP:
+                    case Keys.DOWN:
+                    case Keys.LEFT:
+                    case Keys.RIGHT:
+                        count++;
+                }
+                /* Check if the player finds the door. */
+                for (int i = 0; i < 4; i++) {
+                    MapGenerator.Coordinate neighbour = MapGenerator.applyDir(i, 1, player);
+                    if (gameState.world[neighbour.x][neighbour.y] == Tileset.LOCKED_DOOR) {
+                        door = true;
+                    }
+                }
+            }
+            if (count > ALLOWED_MOVE || door || time / TIME_CORRECT > ALLOWED_TIME) {
+                String message = (count > ALLOWED_MOVE) ? MOVE_OUT : (door ? WIN : TIME_OUT);
+                displayMessage(message);
+                StdDraw.pause(PAUSE * 2);
+                displayMessage(QUITE);
+                StdDraw.pause(PAUSE);
+                System.exit(0);
+                break;
             }
         }
     }
