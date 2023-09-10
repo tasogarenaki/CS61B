@@ -115,13 +115,15 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
      * Bubbles down the node currently at the given index.
      */
     private void sink(int index) {
+        if (leftIndex(index) > size) {
+            return;
+        }
+
         // Throws an exception if index is invalid. DON'T CHANGE THIS LINE.
         validateSinkSwimArg(index);
 
         int minChild = min(leftIndex(index), rightIndex(index));
-        if (leftIndex(index) > size) {
-            return;
-        } else if (min(index, minChild) == minChild) {
+        if (min(index, minChild) == minChild) {
             swap(index, minChild);
             sink(minChild);
         }
@@ -149,7 +151,8 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
      */
     @Override
     public T peek() {
-        return getNode(1).myItem;
+        Node node = getNode(1);
+        return node != null ? node.myItem : null;
     }
 
     /**
@@ -164,6 +167,10 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
     @Override
     public T removeMin() {
         T toRemove = peek();
+        if (size == 0) {
+            return null;
+        }
+
         swap(size, 1);
         contents[size] = null;
         size--;
