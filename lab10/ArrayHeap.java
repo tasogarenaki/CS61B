@@ -169,6 +169,10 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         T toRemove = peek();
         if (size == 0) {
             return null;
+        } else if (size == 1) {
+            size--;
+            contents[1] = null;
+            return toRemove;
         }
 
         swap(size, 1);
