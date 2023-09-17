@@ -1,9 +1,36 @@
 package hw4.puzzle;
 
-public class Board {
+public class Board implements WorldState {
 
-    /** Returns the string representation of the board. 
-      * Uncomment this method. */
+    /* Uncomment this method.
+    public Board(int[][] tiles) {
+
+    }
+    public int tileAt(int i, int j) {
+
+    }
+    public int size() {
+
+    }
+    public Iterable<WorldState> neighbors() {
+
+    }
+    public int hamming() {
+
+    }
+    public int manhattan() {
+
+    }
+    public int estimatedDistanceToGoal() {
+
+    }
+    public boolean equals(Object y) {
+
+    }
+     */
+
+
+    /** Returns the string representation of the board. */
     /*public String toString() {
         StringBuilder s = new StringBuilder();
         int N = size();
