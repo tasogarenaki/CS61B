@@ -3,6 +3,7 @@ package hw4.puzzle;
 import edu.princeton.cs.algs4.MinPQ;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * Solver
@@ -14,41 +15,58 @@ import java.util.List;
  * @author Terry
  */
 public class Solver {
-    private final MinPQ<SearchNode> searchNodes;
+    private MinPQ<SearchNode> searchNodes;
     private SearchNode path = null;
-
 
     /**
      * Constructor which solves the puzzle, computing everything necessary
      * for moves() and solution() to not have to solve the problem again.
      * Solves the puzzle using the A* algorithm. Assumes a solution exists.
+     *
      * @param initial
      */
     public Solver(WorldState initial) {
-        //TODO
         searchNodes = new MinPQ<>(new SearchNodeComparator());
         searchNodes.insert(new SearchNode(initial, null));
 
-
-
+        while (!searchNodes.isEmpty()) {
+            SearchNode x = searchNodes.delMin();
+            WorldState ws = x.state();
+            if (ws.isGoal()) {
+                path = x;
+                break;
+            }
+            for (WorldState neighbour : ws.neighbors()) {
+                if (x.prev() != null && neighbour.equals(x.prev().state())) {
+                    continue;
+                }
+                searchNodes.insert(new SearchNode(neighbour, x));
+            }
+        }
     }
 
-    /**
-     * Returns the minimum number of moves to solve the puzzle starting
-     * at the initial WorldState.
-     */
+        /**
+         * Returns the minimum number of moves to solve the puzzle starting
+         * at the initial WorldState.
+         */
     public int moves() {
-        // TODO
-        return 0;
+        return path.distanceFromStart();
     }
 
-    /**
-     * Returns a sequence of WorldStates from the initial WorldState
-     * o the solution.
-     */
+        /**
+         * Returns a sequence of WorldStates from the initial WorldState
+         * o the solution.
+         */
     public Iterable<WorldState> solution() {
-        //TODO
+        List<WorldState> solution = new LinkedList<>();
+        SearchNode currentNode = path;
 
+        while (currentNode != null) {
+            solution.add(currentNode.state());
+            currentNode = currentNode.prev();
+        }
+
+        Collections.reverse(solution);
+        return solution;
     }
-
 }

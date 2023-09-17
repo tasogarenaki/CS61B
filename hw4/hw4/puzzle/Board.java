@@ -1,6 +1,6 @@
 package hw4.puzzle;
 
-public class Board implements WorldState {
+public class Board {
 
     /* Uncomment this method.
     public Board(int[][] tiles) {

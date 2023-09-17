@@ -13,4 +13,20 @@ public class SearchNode {
         this.prev = prev;
         this.moves = prev == null ? 0 : prev.moves + 1;
     }
+
+    public WorldState state() {
+        return state;
+    }
+
+    public SearchNode prev() {
+        return prev;
+    }
+
+    public int distanceFromStart() {
+        return moves;
+    }
+
+    public int estimatedDistanceToGoal() {
+        return state.estimatedDistanceToGoal();
+    }
 }
