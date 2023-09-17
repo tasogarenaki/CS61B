@@ -37,10 +37,9 @@ public class Solver {
                 break;
             }
             for (WorldState neighbour : ws.neighbors()) {
-                if (x.prev() != null && neighbour.equals(x.prev().state())) {
-                    continue;
+                if (x.prev() == null || !neighbour.equals(x.prev().state())) {
+                    searchNodes.insert(new SearchNode(neighbour, x));
                 }
-                searchNodes.insert(new SearchNode(neighbour, x));
             }
         }
     }
