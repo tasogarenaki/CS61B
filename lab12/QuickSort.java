@@ -68,12 +68,18 @@ public class QuickSort {
             return items;
         }
 
-        Item pivot = getRandomItem(items);
+        // Create a copy of the unsorted queue
+        Queue<Item> unsortedCopy = new Queue<>();
+        for (Item item : items) {
+            unsortedCopy.enqueue(item);
+        }
+
+        Item pivot = getRandomItem(unsortedCopy);
         Queue<Item> less = new Queue<>();
         Queue<Item> equal = new Queue<>();
         Queue<Item> greater = new Queue<>();
 
-        partition(items, pivot, less, equal, greater);
+        partition(unsortedCopy, pivot, less, equal, greater);
 
         Queue<Item> sortedLess = quickSort(less);
         Queue<Item> sortedGreater = quickSort(greater);
