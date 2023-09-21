@@ -34,8 +34,15 @@ public class MergeSort {
     /** Returns a queue of queues that each contain one item from items. */
     private static <Item extends Comparable> Queue<Queue<Item>>
             makeSingleItemQueues(Queue<Item> items) {
-        // Your code here!
-        return null;
+        Queue<Queue<Item>> result = new Queue<>();
+
+        for (Item i : items) {
+            Queue<Item> singleItem = new Queue<>();
+            singleItem.enqueue(i);
+            result.enqueue(singleItem);
+        }
+
+        return result;
     }
 
     /**
@@ -53,14 +60,48 @@ public class MergeSort {
      */
     private static <Item extends Comparable> Queue<Item> mergeSortedQueues(
             Queue<Item> q1, Queue<Item> q2) {
-        // Your code here!
-        return null;
+        Queue<Item> result = new Queue<>();
+
+        while (!(q1.isEmpty() && q2.isEmpty())) {
+            result.enqueue(getMin(q1, q2));
+        }
+
+        return result;
     }
 
     /** Returns a Queue that contains the given items sorted from least to greatest. */
     public static <Item extends Comparable> Queue<Item> mergeSort(
             Queue<Item> items) {
-        // Your code here!
-        return items;
+        if (items.size() <= 1) {
+            return items;
+        }
+
+        Queue<Queue<Item>> toSort = makeSingleItemQueues(items);
+        while (toSort.size() > 1) {
+            Queue<Item> q1 = toSort.dequeue();
+            Queue<Item> q2 = toSort.dequeue();
+            toSort.enqueue(mergeSortedQueues(q1, q2));
+        }
+
+        return toSort.dequeue();
+    }
+
+    /**
+     * Main method used to test the implementation.
+     * @param args
+     */
+    public static void main(String[] args) {
+        String[] names = {"Vanessa", "Kevin", "Terry", "Megan", "Ben", "Alice"};
+        Queue<String> unsorted = new Queue<>();
+        for (String name : names) {
+            unsorted.enqueue(name);
+        }
+
+        Queue<String> sorted = MergeSort.mergeSort(unsorted);
+
+        System.out.println("Unsorted queue:");
+        System.out.println(unsorted.toString());
+        System.out.println("Sorted queue:");
+        System.out.println(sorted.toString());
     }
 }
