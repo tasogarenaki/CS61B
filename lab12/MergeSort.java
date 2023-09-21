@@ -88,7 +88,6 @@ public class MergeSort {
 
     /**
      * Main method used to test the implementation.
-     * @param args
      */
     public static void main(String[] args) {
         String[] names = {"Vanessa", "Kevin", "Terry", "Megan", "Ben", "Alice"};
