@@ -137,5 +137,12 @@ public class RadixSort {
         String[] sorted5 = RadixSort.sort(unsorted5);
         System.out.println("Sorted Array (Test Case 5):   " + Arrays.toString(sorted5));
         System.out.println();
+
+        // Test case 5: Test with special chars
+        String[] unsorted6 = {"*", "U", "à", "ú", "ü", "ê", "_", "¹", "·", "8", "]"};
+        System.out.println("Original Array (Test Case 6): " + Arrays.toString(unsorted6));
+        String[] sorted6 = RadixSort.sort(unsorted6);
+        System.out.println("Sorted Array (Test Case 6):   " + Arrays.toString(sorted6));
+        System.out.println();
     }
 }
