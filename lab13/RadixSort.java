@@ -44,7 +44,7 @@ public class RadixSort {
 
             // gather all the counts for each valid value
             for (String s : asciis) {
-                int item = (position < s.length()) ? s.charAt(position) : 0;
+                int item = (position < s.length()) ? (int) s.charAt(position) : 0;
                 count[item]++;
             }
 
@@ -58,7 +58,7 @@ public class RadixSort {
 
             // Build the sorted array
             for (int i = 0; i < asciis.length; i++) {
-                int item = (position < asciis[i].length()) ? asciis[i].charAt(position) : 0;
+                int item = (position < asciis[i].length()) ? (int) asciis[i].charAt(position) : 0;
                 int place = starts[item];
                 aux[place] = asciis[i];
                 starts[item]++;
