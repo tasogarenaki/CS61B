@@ -21,5 +21,6 @@ public class Main {
 		Generator generator = new SawToothGenerator(512);
 		GeneratorAudioVisualizer gav = new GeneratorAudioVisualizer(generator);
 		gav.drawAndPlay(4096, 1000000);
+
 	}
 }
