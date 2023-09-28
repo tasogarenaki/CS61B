@@ -12,7 +12,6 @@ import huglife.Empty;
 /** Tests the plip class   
  *  @authr FIXME
  */
-
 public class TestPlip {
 
     /* Replace with the magic word given in lab.
@@ -36,10 +35,14 @@ public class TestPlip {
 
     @Test
     public void testReplicate() {
-
+        Plip parent = new Plip(1.5);
+        Plip child = parent.replicate();
+        assertEquals(1.5 / 2, child.energy(), 0.0001);
+        assertEquals(1.5 / 2, parent.energy(), 0.0001);
+        assertNotSame(parent, child);
     }
 
-    //@Test
+    @Test
     public void testChoose() {
         Plip p = new Plip(1.2);
         HashMap<Direction, Occupant> surrounded = new HashMap<Direction, Occupant>();
@@ -48,14 +51,42 @@ public class TestPlip {
         surrounded.put(Direction.LEFT, new Impassible());
         surrounded.put(Direction.RIGHT, new Impassible());
 
-        //You can create new empties with new Empty();
-        //Despite what the spec says, you cannot test for Cloruses nearby yet.
-        //Sorry!  
-
         Action actual = p.chooseAction(surrounded);
         Action expected = new Action(Action.ActionType.STAY);
-
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testChooseReplicate() {
+        Plip p = new Plip(2.0); // Energy is greater than REPLICATE_MIN_ENERGY
+        HashMap<Direction, Occupant> neighbors = new HashMap<Direction, Occupant>();
+        neighbors.put(Direction.TOP, new Empty());
+        neighbors.put(Direction.BOTTOM, new Impassible());
+        neighbors.put(Direction.LEFT, new Impassible());
+        neighbors.put(Direction.RIGHT, new Impassible());
+
+        Action actual = p.chooseAction(neighbors);
+        Action expected = new Action(Action.ActionType.REPLICATE, Direction.TOP);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testChooseMoveWithCloruses() {
+        Plip p = new Plip(0.9); // Energy is less than REPLICATE_MIN_ENERGY
+        HashMap<Direction, Occupant> neighbors = new HashMap<Direction, Occupant>();
+        neighbors.put(Direction.TOP, new Empty());
+        neighbors.put(Direction.BOTTOM, new Clorus());
+        neighbors.put(Direction.LEFT, new Impassible());
+        neighbors.put(Direction.RIGHT, new Impassible());
+
+        // Simulate a 50% probability of moving
+        boolean shouldMove = Math.random() < 0.5;
+        Action actual = p.chooseAction(neighbors);
+        if (shouldMove) {
+            assertEquals(Action.ActionType.MOVE, actual.type);
+        } else {
+            assertEquals(Action.ActionType.STAY, actual.type);
+        }
     }
 
     public static void main(String[] args) {
