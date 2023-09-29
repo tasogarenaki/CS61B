@@ -16,13 +16,17 @@ public class Clorus extends Creature {
     /** blue color. */
     private int b;
 
+    private static final double REPLICATE_MIN_ENERGY = 1;
+    private static final double MOVE_ENERGY = -0.03;
+    private static final double STAY_ENERGY = -0.01;
+
     /** creates plip with energy equal to E. */
     public Clorus(double e) {
         // TODO
         super("clorus");
-        r = 0;
+        r = 34;
         g = 0;
-        b = 0;
+        b = 231;
         energy = e;
     }
 
@@ -31,56 +35,46 @@ public class Clorus extends Creature {
         this(1);
     }
 
-    /** Should return a color with red = 99, blue = 76, and green that varies
-     *  linearly based on the energy of the Plip. If the plip has zero energy,
-     *  it should have a green value of 63. If it has max energy, it should
-     *  have a green value of 255. The green value should vary with energy
-     *  linearly in between these two extremes. It's not absolutely vital
-     *  that you get this exactly correct.
-     */
+    /** Should return a color with red = 34, blue = 231, and green = 0. */
     @Override
     public Color color() {
-        // TODO
-        return null;
+        return color(r, g, b);
     }
 
-    /** Do nothing with C, Clorus are pacifists. */
+    /**  When attacks another creature, it gains the other creature's energy. */
     @Override
     public void attack(Creature c) {
-        // TODO
+        energy += c.energy();
     }
 
-    /** Clorus should lose 0.15 units of energy when moving. If you want to
-     *  to avoid the magic number warning, you'll need to make a
-     *  private static final variable. This is not required for this lab.
-     */
+    /** Clorus should lose 0.03 units of energy when moving. */
     @Override
     public void move() {
-        // TODO
+        energy += MOVE_ENERGY;
     }
 
 
-    /** Clorus gain 0.2 energy when staying due to photosynthesis. */
+    /** Clorus should lose 0.01 energy when staying. */
     @Override
     public void stay() {
-        // TODO
+        energy += STAY_ENERGY;
     }
 
     /** Clorus and their offspring each get 50% of the energy, with none
-     *  lost to the process. Now that's efficiency! Returns a baby
-     *  Plip.
+     *  lost to the process. Now that's efficiency! Returns a baby Clorus.
      */
     @Override
-    public Plip replicate() {
-        // TODO
-        return null;
+    public Clorus replicate() {
+        double keep = energy / 2;
+        energy = keep;
+        return new Clorus(keep);
     }
 
     /** Clorus take exactly the following actions based on NEIGHBORS:
      *  1. If no empty adjacent spaces, STAY.
-     *  2. Otherwise, if energy >= 1, REPLICATE.
-     *  3. Otherwise, if any Cloruses, MOVE with 50% probability.
-     *  4. Otherwise, if nothing else, STAY
+     *  2. Otherwise, if any Plips are seen, the Clorus will ATTACK one of them randomly.
+     *  3. Otherwise, if energy >= 1, REPLICATE to any empty square.
+     *  4. Otherwise, MOVE to a random empty square.
      *
      *  Returns an object of type Action. See Action.java for the
      *  scoop on how Actions work. See SampleCreature.chooseAction()
@@ -88,10 +82,19 @@ public class Clorus extends Creature {
      */
     @Override
     public Action chooseAction(Map<Direction, Occupant> neighbors) {
-        // TODO
-        return null;
+        List<Direction> empties = getNeighborsOfType(neighbors, "empty");
+        List<Direction> plips = getNeighborsOfType(neighbors, "plip");
+        if (empties.isEmpty()) {
+            return new Action(Action.ActionType.STAY);
+        } else if (!plips.isEmpty()) {
+            Direction attackDir = HugLifeUtils.randomEntry(plips);
+            return new Action(Action.ActionType.ATTACK, attackDir);
+        } else if (energy() >= REPLICATE_MIN_ENERGY) {
+            Direction replicateDir = HugLifeUtils.randomEntry(empties);
+            return new Action(Action.ActionType.REPLICATE, replicateDir);
+        } else {
+            Direction moveDir = HugLifeUtils.randomEntry(empties);
+            return new Action(Action.ActionType.MOVE, moveDir);
+        }
     }
-
-
-
 }

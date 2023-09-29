@@ -47,7 +47,8 @@ public class Plip extends Creature {
      *  that you get this exactly correct.
      */
     public Color color() {
-        g = (int) ((255 - 63) * energy / MAX_ENERGY + 63);
+        //g = (int) ((255 - 63) * energy / MAX_ENERGY + 63);
+        g = (int) Math.min(255, Math.max(0, ((255 - 63) * energy / MAX_ENERGY + 63)));
         return color(r, g, b);
     }
 
