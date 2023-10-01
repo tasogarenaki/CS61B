@@ -10,7 +10,7 @@ import java.util.Map;
 public class Rasterer {
 
     public Rasterer() {
-        // YOUR CODE HERE
+        // TODO: YOUR CODE HERE
     }
 
     /**
