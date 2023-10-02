@@ -108,6 +108,20 @@ public class Rasterer {
             results.put(RASTER_LRLON, -1);
             results.put(RASTER_LRLAT, -1);
         } else {
+            /** TODO:
+             *  Render Grid
+             *  Coordinates of Quer Box -> double[] calculateBoundingBox(ullon, ullat...)
+             */
+            Coordinate ul = new Coordinate(ulLon, ulLat);
+            Coordinate lr = new Coordinate(lrLon, lrLat);
+
+
+            double[] boundingBox = calculateBoundingBox(ul.lon, ul.lat, lr.lon, lr.lat, depth);
+            results.put(RASTER_ULLON, boundingBox[0]);
+            results.put(RASTER_ULLAT, boundingBox[1]);
+            results.put(RASTER_LRLON, boundingBox[2]);
+            results.put(RASTER_LRLAT, boundingBox[3]);
+
 
         }
 
@@ -164,6 +178,60 @@ public class Rasterer {
                 (ulLon < ROOT_LR.lon && ROOT_UL.lon < lrLon) &&
                 (ROOT_LR.lat < ulLat && lrLat < ROOT_UL.lat);
     }
+
+
+    /**
+     * Calculates the bounding box coordinates based on the upper-left (ulLon, ulLat) and
+     * lower-right (lrLon, lrLat) coordinates, the image depth, and the tile lengths.
+     *
+     * @param ulLon  The longitude coordinate of the upper-left corner of the query box.
+     * @param ulLat  The latitude coordinate of the upper-left corner of the query box.
+     * @param lrLon  The longitude coordinate of the lower-right corner of the query box.
+     * @param lrLat  The latitude coordinate of the lower-right corner of the query box.
+     * @param depth  The image depth (zoom level) of the tiles on which to calculate the index.
+     * @return An array containing the raster coordinates [raster_ul_lon, raster_ul_lat, raster_lr_lon, raster_lr_lat].
+     */
+    private double[] calculateBoundingBox(double ulLon, double ulLat, double lrLon, double lrLat, int depth) {
+        // TODO: tileLonLength, tileLatLength
+        double tileLongitudeLength = tileLonLength(depth);
+        double tileLatitudeLength = tileLatLength(depth);
+        int[] indices = calculateIndices(ulLon, ulLat, lrLon, lrLat, depth);
+        double[] boundingBox = new double[4];
+
+        // Calculate raster coordinates
+        boundingBox[0] = ROOT_UL.lon + indices[0] * tileLongitudeLength;
+        boundingBox[1] = ROOT_LR.lat + (numTilesAtDepth(depth) - indices[2]) * tileLatitudeLength;
+        boundingBox[2] = ROOT_UL.lon + (indices[1] + 1) * tileLongitudeLength;
+        boundingBox[3] = ROOT_LR.lat + (numTilesAtDepth(depth) - indices[3] - 1) * tileLatitudeLength;
+
+        return boundingBox;
+    }
+
+    /**
+     * Calculates the indices for the bounding box coordinates based on the upper-left (ulLon, ulLat)
+     * and lower-right (lrLon, lrLat) coordinates, and the image depth.
+     *
+     * @param ulLon  The longitude coordinate of the upper-left corner of the query box.
+     * @param ulLat  The latitude coordinate of the upper-left corner of the query box.
+     * @param lrLon  The longitude coordinate of the lower-right corner of the query box.
+     * @param lrLat  The latitude coordinate of the lower-right corner of the query box.
+     * @param depth  The image depth (zoom level) of the tiles on which to calculate the index.
+     * @return An array containing the indices [X-Index-Left, X-Index-Right, Y-Index-Upper, Y-Index-Lower].
+     */
+    private int[] calculateIndices(double ulLon, double ulLat, double lrLon, double lrLat, int depth) {
+        double tileLongitudeLength = tileLonLength(depth);
+        double tileLatitudeLength = tileLatLength(depth);
+
+        int xIndexLeft = (int) Math.max((ulLon - ROOT_UL.lon) / tileLongitudeLength, 0);
+        int xIndexRight = (int) Math.min((lrLon - ROOT_UL.lon) / tileLongitudeLength, numTilesAtDepth(depth) - 1);
+        int yIndexUpper = (int) Math.max((ROOT_UL.lat - ulLat) / tileLatitudeLength, 0);
+        int yIndexLower = (int) Math.min((ROOT_UL.lat - lrLat) / tileLatitudeLength, numTilesAtDepth(depth) - 1);
+
+        return new int[]{xIndexLeft, xIndexRight, yIndexUpper, yIndexLower};
+    }
+
+
+
 
 
 
