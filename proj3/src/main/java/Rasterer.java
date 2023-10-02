@@ -40,6 +40,17 @@ public class Rasterer {
      * "depth"         : Number, the depth of the nodes of the rastered image <br>
      * "query_success" : Boolean, whether the query was able to successfully complete; don't
      *                    forget to set this to true on success! <br>
+     *
+     * File name format: dD_xk_yk, where D represents depth, and k equals 2^D - 1.
+     * The number of tiles per side is 2^D.
+     * tileLonLength   : The length in longitude units of a tile.
+     * tileLatLength   : The length in latitude units of a tile.
+     * xIndexLeft      : The leftmost index of a tile in the x direction (longitude).
+     * xIndexRight     : The rightmost index of a tile in the x direction (longitude).
+     * yIndexUpper     : The topmost index of a tile in the y direction (latitude).
+     * yIndexLower     : The bottommost index of a tile in the y direction (latitude).
+     * The implementation with the assistance of this image:
+     * https://sp18.datastructur.es/materials/proj/proj3/rastering_example.png
      */
     public Map<String, Object> getMapRaster(Map<String, Double> params) {
         // System.out.println(params);
