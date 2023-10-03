@@ -108,28 +108,20 @@ public class Rasterer {
             results.put(RASTER_LRLON, -1);
             results.put(RASTER_LRLAT, -1);
         } else {
-            /** TODO:
-             *  Render Grid
-             *  Coordinates of Quer Box -> double[] calculateBoundingBox(ullon, ullat...)
-             */
             Coordinate ul = new Coordinate(ulLon, ulLat);
             Coordinate lr = new Coordinate(lrLon, lrLat);
-
-
+            String[][] renderGrid = getRenderGrid(ul.lon, ul.lat, lr.lon, lr.lat, depth);
             double[] boundingBox = calculateBoundingBox(ul.lon, ul.lat, lr.lon, lr.lat, depth);
+            results.put(RASTER_QUERY_SUCCESS, success);
+            results.put(RASTER_RENDER_GRID, renderGrid);
+            results.put(RASTER_DEPTH, depth);
             results.put(RASTER_ULLON, boundingBox[0]);
             results.put(RASTER_ULLAT, boundingBox[1]);
             results.put(RASTER_LRLON, boundingBox[2]);
             results.put(RASTER_LRLAT, boundingBox[3]);
-
-
         }
-
-
-
         return results;
     }
-
 
     /**
      * Calculates the number of tiles at the given depth,
@@ -179,6 +171,31 @@ public class Rasterer {
                 (ROOT_LR.lat < ulLat && lrLat < ROOT_UL.lat);
     }
 
+    /**
+     * Generates a render grid of tile file names within the specified bounding box at the given depth.
+     *
+     * @param ulLon  The longitude coordinate of the upper-left corner of the query box.
+     * @param ulLat  The latitude coordinate of the upper-left corner of the query box.
+     * @param lrLon  The longitude coordinate of the lower-right corner of the query box.
+     * @param lrLat  The latitude coordinate of the lower-right corner of the query box.
+     * @param depth  The image depth (zoom level) for which to generate the render grid.
+     * @return A 2D array representing the render grid of tile file names.
+     */
+    private String[][] getRenderGrid(double ulLon, double ulLat, double lrLon, double lrLat, int depth) {
+        int[] indices = calculateIndices(ulLon, ulLat, lrLon, lrLat, depth);
+        int gridLengthX = indices[1] - indices[0] + 1;
+        int gridLengthY = indices[3] - indices[2] + 1;
+        String[][] renderGrid = new String[gridLengthY][gridLengthX];   // [y][x]
+
+        for (int y = 0; y < gridLengthY; y++) {
+            int yTile = indices[2] + y;
+            for (int x = 0; x < gridLengthX; x++) {
+                int xTile = indices[0] + x;
+                renderGrid[y][x] = "d" + depth + "_x" + xTile + "_y" + yTile + IMAGE_FILE_FORMAT;
+            }
+        }
+        return renderGrid;
+    }
 
     /**
      * Calculates the bounding box coordinates based on the upper-left (ulLon, ulLat) and
@@ -192,7 +209,6 @@ public class Rasterer {
      * @return An array containing the raster coordinates [raster_ul_lon, raster_ul_lat, raster_lr_lon, raster_lr_lat].
      */
     private double[] calculateBoundingBox(double ulLon, double ulLat, double lrLon, double lrLat, int depth) {
-        // TODO: tileLonLength, tileLatLength
         double tileLongitudeLength = tileLonLength(depth);
         double tileLatitudeLength = tileLatLength(depth);
         int[] indices = calculateIndices(ulLon, ulLat, lrLon, lrLat, depth);
@@ -221,19 +237,34 @@ public class Rasterer {
     private int[] calculateIndices(double ulLon, double ulLat, double lrLon, double lrLat, int depth) {
         double tileLongitudeLength = tileLonLength(depth);
         double tileLatitudeLength = tileLatLength(depth);
+        int[] indices = new int[4];
 
-        int xIndexLeft = (int) Math.max((ulLon - ROOT_UL.lon) / tileLongitudeLength, 0);
-        int xIndexRight = (int) Math.min((lrLon - ROOT_UL.lon) / tileLongitudeLength, numTilesAtDepth(depth) - 1);
-        int yIndexUpper = (int) Math.max((ROOT_UL.lat - ulLat) / tileLatitudeLength, 0);
-        int yIndexLower = (int) Math.min((ROOT_UL.lat - lrLat) / tileLatitudeLength, numTilesAtDepth(depth) - 1);
+        // X-Index-Left, X-Index-Right, Y-Index-Upper, Y-Index-Lower
+        indices[0] = (int) Math.max((ulLon - ROOT_UL.lon) / tileLongitudeLength, 0);
+        indices[1] = (int) Math.min((lrLon - ROOT_UL.lon) / tileLongitudeLength, numTilesAtDepth(depth) - 1);
+        indices[2] = (int) Math.max((ROOT_UL.lat - ulLat) / tileLatitudeLength, 0);
+        indices[3] = (int) Math.min((ROOT_UL.lat - lrLat) / tileLatitudeLength, numTilesAtDepth(depth) - 1);
 
-        return new int[]{xIndexLeft, xIndexRight, yIndexUpper, yIndexLower};
+        return indices;
     }
 
+    /**
+     * Calculates the longitudinal length of a single tile at the given image depth (zoom level).
+     *
+     * @param depth  The image depth (zoom level) for which to calculate the tile's longitudinal length.
+     * @return The longitudinal length of a single tile at the specified image depth.
+     */
+    private double tileLonLength(int depth) {
+        return (ROOT_LR.lon - ROOT_UL.lon) / numTilesAtDepth(depth);
+    }
 
-
-
-
-
-
+    /**
+     * Calculates the latitudinal length of a single tile at the given image depth (zoom level).
+     *
+     * @param depth  The image depth (zoom level) for which to calculate the tile's latitudinal length.
+     * @return The latitudinal length of a single tile at the specified image depth.
+     */
+    private double tileLatLength(int depth) {
+        return (ROOT_UL.lat - ROOT_LR.lat) / numTilesAtDepth(depth);
+    }
 }
