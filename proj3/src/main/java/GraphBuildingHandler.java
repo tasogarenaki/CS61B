@@ -45,6 +45,7 @@ public class GraphBuildingHandler extends DefaultHandler {
      */
     public GraphBuildingHandler(GraphDB g) {
         this.g = g;
+        // TODO: starting part II, see notes
     }
 
     /**
