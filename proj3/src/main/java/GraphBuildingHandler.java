@@ -87,10 +87,10 @@ public class GraphBuildingHandler extends DefaultHandler {
         } else if (qName.equals("way")) {
             /* We encountered a new <way...> tag. */
             activeState = "way";
+            tempWayNodes = new ArrayList<>();   // Initialize here to avoid potential bugs.
             wayId = Long.parseLong(attributes.getValue("id"));
         } else if (activeState.equals("way") && qName.equals("nd")) {
             /* While looking at a way, we found a <nd...> tag. */
-            tempWayNodes = new ArrayList<>();
             long nodeId = Long.parseLong(attributes.getValue("ref"));
             tempWayNodes.add(g.getNode(nodeId));
         } else if (activeState.equals("way") && qName.equals("tag")) {
@@ -133,10 +133,15 @@ public class GraphBuildingHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (qName.equals("way")) {
             /* We are done looking at a way. (We finished looking at the nodes, speeds, etc...)*/
-            /* Hint1: If you have stored the possible connections for this way, here's your
-            chance to actually connect the nodes together if the way is valid. */
-//            System.out.println("Finishing a way...");
+            if (ALLOWED_HIGHWAY_TYPES.contains(highwayType)) {
+                Highway hw = new Highway(wayId, waySpeed, wayName, highwayType);
+                for (Node n : tempWayNodes) {
+                    hw.addNode(n);
+                }
+                g.putHighway(hw);
+            }
+            tempWayNodes.clear();
+            highwayType = "";
         }
     }
-
 }
