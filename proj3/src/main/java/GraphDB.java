@@ -1,4 +1,8 @@
-import org.xml.sax.SAXException;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,7 +10,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.ArrayList;
+import org.xml.sax.SAXException;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -20,6 +24,8 @@ import java.util.ArrayList;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
+    private Map<Long, Node> nodes;
+    private HashMap<Long, Location> locations;
 
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -27,6 +33,8 @@ public class GraphDB {
      * @param dbPath Path to the XML file to be parsed.
      */
     public GraphDB(String dbPath) {
+        nodes = new HashMap<>();
+        locations = new HashMap<>();
         try {
             File inputFile = new File(dbPath);
             FileInputStream inputStream = new FileInputStream(inputFile);
@@ -155,5 +163,22 @@ public class GraphDB {
      */
     double lat(long v) {
         return 0;
+    }
+
+    /** Helper methods. */
+    Node putNode(Node node) {
+        return nodes.put(node.id, node);
+    }
+
+    Node getNode(long id) {
+        return nodes.get(id);
+    }
+
+    Location putLocation(Location locale) {
+        return locations.put(locale.id, locale);
+    }
+
+    Location getLocation(Long id) {
+        return locations.get(id);
     }
 }

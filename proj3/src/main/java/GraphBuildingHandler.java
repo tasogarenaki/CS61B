@@ -3,6 +3,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,13 +41,21 @@ public class GraphBuildingHandler extends DefaultHandler {
     private String activeState = "";
     private final GraphDB g;
 
+    /** Variables for sub-elements. */
+    private Node currentNode;
+    private long wayId;
+    private int waySpeed;
+    private String wayName;
+    private String highwayType;
+    private List<Node> tempWayNodes;    // Nodes that are parsed while processing a way are discarded if the way is not a highway.
+
     /**
      * Create a new GraphBuildingHandler.
      * @param g The graph to populate with the XML data.
      */
     public GraphBuildingHandler(GraphDB g) {
         this.g = g;
-        // TODO: starting part II, see notes
+        this.currentNode = null;
     }
 
     /**
@@ -65,55 +75,46 @@ public class GraphBuildingHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
-        /* Some example code on how you might begin to parse XML files. */
         if (qName.equals("node")) {
             /* We encountered a new <node...> tag. */
             activeState = "node";
-//            System.out.println("Node id: " + attributes.getValue("id"));
-//            System.out.println("Node lon: " + attributes.getValue("lon"));
-//            System.out.println("Node lat: " + attributes.getValue("lat"));
-
-            /* TODO Use the above information to save a "node" to somewhere. */
-            /* Hint: A graph-like structure would be nice. */
-
+            long id = Long.parseLong(attributes.getValue("id"));
+            double lon = Double.parseDouble(attributes.getValue("lon"));
+            double lat = Double.parseDouble(attributes.getValue("lat"));
+            Node node = new Node(id, lon, lat);
+            currentNode = node;
+            g.putNode(node);
         } else if (qName.equals("way")) {
             /* We encountered a new <way...> tag. */
             activeState = "way";
-//            System.out.println("Beginning a way...");
+            wayId = Long.parseLong(attributes.getValue("id"));
         } else if (activeState.equals("way") && qName.equals("nd")) {
             /* While looking at a way, we found a <nd...> tag. */
-            //System.out.println("Id of a node in this way: " + attributes.getValue("ref"));
-
-            /* TODO Use the above id to make "possible" connections between the nodes in this way */
-            /* Hint1: It would be useful to remember what was the last node in this way. */
-            /* Hint2: Not all ways are valid. So, directly connecting the nodes here would be
-            cumbersome since you might have to remove the connections if you later see a tag that
-            makes this way invalid. Instead, think of keeping a list of possible connections and
-            remember whether this way is valid or not. */
-
+            tempWayNodes = new ArrayList<>();
+            long nodeId = Long.parseLong(attributes.getValue("ref"));
+            tempWayNodes.add(g.getNode(nodeId));
         } else if (activeState.equals("way") && qName.equals("tag")) {
             /* While looking at a way, we found a <tag...> tag. */
             String k = attributes.getValue("k");
             String v = attributes.getValue("v");
             if (k.equals("maxspeed")) {
-                //System.out.println("Max Speed: " + v);
-                /* TODO set the max speed of the "current way" here. */
+                String[] parts = v.split(" ");
+                if (parts.length >= 2 && parts[1].equals("mph")) {
+                    waySpeed = Integer.parseInt(parts[0]);
+                } else {
+                    waySpeed = (int) (Integer.parseInt(parts[0]) * 0.621371); // assume that the unit is km/h
+                }
             } else if (k.equals("highway")) {
-                //System.out.println("Highway type: " + v);
-                /* TODO Figure out whether this way and its connections are valid. */
-                /* Hint: Setting a "flag" is good enough! */
+                highwayType = v;
             } else if (k.equals("name")) {
-                //System.out.println("Way Name: " + v);
+                wayName = v;
             }
-//            System.out.println("Tag with k=" + k + ", v=" + v + ".");
         } else if (activeState.equals("node") && qName.equals("tag") && attributes.getValue("k")
                 .equals("name")) {
             /* While looking at a node, we found a <tag...> with k="name". */
-            /* TODO Create a location. */
-            /* Hint: Since we found this <tag...> INSIDE a node, we should probably remember which
-            node this tag belongs to. Remember XML is parsed top-to-bottom, so probably it's the
-            last node that you looked at (check the first if-case). */
-//            System.out.println("Node's name: " + attributes.getValue("v"));
+            Location locale = new Location(currentNode);
+            locale.setAttribute("name", attributes.getValue("v"));
+            g.putLocation(locale);
         }
     }
 
