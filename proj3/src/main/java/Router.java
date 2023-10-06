@@ -93,8 +93,47 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-
+        List<NavigationDirection> result = new ArrayList<>();
+        if (route.size() <= 1) {
+            return result;
+        }
+        NavigationDirection nd = new NavigationDirection();
+        nd.direction = NavigationDirection.START;
+        nd.distance = 0.0;
+        nd.way = NavigationDirection.getHighway(g, route.get(0), route.get(1));
+        boolean prevWayIsEmpty = nd.way.isEmpty(); // Track if the previous road name was empty
+        for (int i = 1; i < route.size(); i++) {
+            Long prev = route.get(i - 1);
+            Long curr = route.get(i);
+            nd.distance += g.distance(prev, curr);
+            if (i == route.size() - 1) {
+                if (!prevWayIsEmpty) { // Check if the previous road name was not empty
+                    result.add(nd);
+                }
+                break;
+            }
+            Long next = route.get(i + 1);
+            String nextWayName = NavigationDirection.getHighway(g, curr, next);
+            if (nextWayName.isEmpty() || !nd.way.equals(nextWayName)) {
+                double prevBearing = g.bearing(route.get(i - 1), route.get(i));
+                double curBearing = g.bearing(route.get(i), route.get(i+1));
+                if (!prevWayIsEmpty) { // Check if the previous road name was not empty
+                    result.add(nd);
+                }
+                prevWayIsEmpty = nextWayName.isEmpty(); // Update prevWayIsEmpty for the current road
+                nd = new NavigationDirection();
+                nd.direction = NavigationDirection.getDirection(prevBearing, curBearing);
+                nd.distance = 0.0;
+                nd.way = nextWayName;
+            }
+        }
+        return result;
     }
+
+
+
+
+
 
 
 
@@ -217,6 +256,7 @@ public class Router {
             return Objects.hash(direction, way, distance);
         }
 
+
         private static int getDirection(double b1, double b2) {
             double shift = b2 - b1;
             if (shift > 180) {
@@ -239,6 +279,38 @@ public class Router {
             } else {
                 return NavigationDirection.SHARP_RIGHT;
             }
+        }
+
+        private static String getHighway(GraphDB g, Long v1, Long v2) {
+            Iterable<Highway> highways = g.highways();
+            Set<Highway> highwaysForV1 = new HashSet<>();
+            Set<Highway> highwaysForV2 = new HashSet<>();
+
+            Node n1 = g.getNode(v1);
+            Node n2 = g.getNode(v2);
+
+            for (Highway highway : highways) {
+                if (highway.contains(n1)) {
+                    highwaysForV1.add(highway);
+                }
+                if (highway.contains(n2)) {
+                    highwaysForV2.add(highway);
+                }
+            }
+
+            Set<Highway> intersection = new HashSet<>();
+            for (Highway highway : highwaysForV1) {
+                if (highwaysForV2.contains(highway)) {
+                    intersection.add(highway);
+                }
+            }
+
+            // Handle the case where there are no intersecting highways
+            if (intersection.isEmpty()) {
+                return ""; // Return an empty string
+            }
+
+            return intersection.iterator().next().name;
         }
 
     }

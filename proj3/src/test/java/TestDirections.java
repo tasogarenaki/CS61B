@@ -37,6 +37,9 @@ public class TestDirections {
             for (int j = 0; j < actual.size(); j++) {
                 Router.NavigationDirection actualDir = actual.get(j);
                 Router.NavigationDirection expectedDir = expected.get(j);
+                System.out.println("now j:" + j);
+                System.out.println("value act:" + actualDir);
+                System.out.println("value exp:" + expectedDir);
                 assertEquals("Directions did not match", expectedDir.toString(),
                         actualDir.toString());
             }
