@@ -205,6 +205,10 @@ public class GraphDB {
         return locations.get(id);
     }
 
+    Iterable<Highway> highways() {
+        return highways.values();
+    }
+
     Highway putHighway(Highway hw) {
         return highways.put(hw.id, hw);
     }

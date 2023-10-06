@@ -2,6 +2,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.PriorityQueue;
+import java.util.Iterator;
 
 /**
  * This class provides a shortestPath method for finding routes between two points
@@ -25,10 +32,57 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        return null; // TODO: starting part iii, see notes
+        Node start = g.getNode(g.closest(stlon, stlat));
+        Node dest = g.getNode(g.closest(destlon, destlat));
+        Map<Long, SearchNode> visited = new HashMap<>();             // store the pre node in the shortest path
+        SearchNode current = new SearchNode(start, null, dest);      // lowest f(n) for all nodes from start to destination
+        PriorityQueue<SearchNode> fringe = new PriorityQueue<>();    // store nodes with their f(n)
+        fringe.add(current);
+
+        /* A* algorithm */
+        while(!fringe.isEmpty()) {
+            current = fringe.remove();
+            Node currentNode = current.node;
+            visited.put(currentNode.id, current);
+            /* Reach the end node. */
+            if (currentNode.equals(dest)) {
+                break;
+            }
+
+            for (Node neighbor : currentNode.neighbors()) {
+                SearchNode next = new SearchNode(neighbor, current, dest);
+                Iterator<SearchNode> iter = fringe.iterator();
+                boolean addNext = true;
+
+                /* Skip nodes that have already been visited. */
+                if (visited.containsKey(next.node.id)) {
+                    continue;
+                }
+
+                while (iter.hasNext()) {
+                    SearchNode n = iter.next();
+                    if (next.equals(n) && n.fFunc() > next.fFunc()) {
+                        iter.remove();
+                    } else if (next.equals(n) && n.fFunc() <= next.fFunc()) {
+                        addNext = false;
+                        break;
+                    }
+                }
+                if (addNext) {
+                    fringe.add(next);
+                }
+            }
+        }
+
+        /* Start from dest, follow back the chain of search nodes until start, and save each in path. */
+        List<Long> path = new ArrayList<>();
+        while (current != null) {
+            path.add(0, current.node.id);
+            current = current.previousNode;
+        }
+
+        return path;
     }
-
-
 
     /**
      * Create the list of directions corresponding to a route on the graph.
@@ -39,8 +93,9 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-        return null; // FIXME
+
     }
+
 
 
     /**
@@ -67,7 +122,7 @@ public class Router {
 
         /** Default name for an unknown way. */
         public static final String UNKNOWN_ROAD = "unknown road";
-        
+
         /** Static initializer. */
         static {
             DIRECTIONS[START] = "Start";
@@ -160,6 +215,107 @@ public class Router {
         @Override
         public int hashCode() {
             return Objects.hash(direction, way, distance);
+        }
+
+        private static int getDirection(double b1, double b2) {
+            double shift = b2 - b1;
+            if (shift > 180) {
+                shift -= 360;
+            } else if (shift < -180) {
+                shift += 360;
+            }
+            if (shift <= 15 && shift >= -15) {
+                return NavigationDirection.STRAIGHT;
+            } else if (shift < -15 && shift >= -30) {
+                return NavigationDirection.SLIGHT_LEFT;
+            } else if (shift > 15 && shift <= 30) {
+                return NavigationDirection.SLIGHT_RIGHT;
+            } else if (shift < -30 && shift >= -100) {
+                return NavigationDirection.LEFT;
+            } else if (shift > 30 && shift <= 100) {
+                return NavigationDirection.RIGHT;
+            } else if (shift < -100) {
+                return NavigationDirection.SHARP_LEFT;
+            } else {
+                return NavigationDirection.SHARP_RIGHT;
+            }
+        }
+
+    }
+
+    /**
+     * SearchNode
+     *
+     * This class is used to perform A* search on a graph.
+     * This class holds values for f(n), g(n), and h(n) as defined in A*.
+     * g(n):     shortest path cost - distance between the Node contained in an instance
+     *           and the Node contained in the instance referenced by the "previous" instance member.
+     * h(n):     heuristic cost - distance between the current node and the target node.
+     * Implements Comparable<T> on the value of f(n), as it's used as the priority
+     * in the Priority Queue used as the fringe in A*.
+     */
+    private static class SearchNode implements Comparable<SearchNode> {
+        private SearchNode previousNode;
+        private final Node node;
+        private final double hFunc;
+        private double gFunc;
+
+        SearchNode(Node node, SearchNode previousNode, Node target) {
+            this.node = node;
+            this.previousNode = previousNode;
+            /* Calculate the cost of the path from the start node to this node (gn). */
+            this.gFunc = previousNode != null
+                    ? previousNode.gFunc
+                    + GraphDB.distance(previousNode.node.lon, previousNode.node.lat, node.lon, node.lat)
+                    : 0;
+            /* Calculate the heuristic estimate of the remaining distance to the goal (hn). */
+            this.hFunc = GraphDB.distance(node.lon, node.lat, target.lon, target.lat);
+        }
+
+        /**
+         * Compares two SearchNode instances based on the f(n) value..
+         *
+         * @param other The other SearchNode instance to compare to.
+         * @return -1 if the other node has a smaller f(n), +1 if this one's is smaller, or else 0.
+         */
+        @Override
+        public int compareTo(SearchNode other) {
+            return Double.compare(this.fFunc(), other.fFunc());
+        }
+
+        /**
+         * Checks if two SearchNode instances are equal based on the wrapped node.
+         *
+         * @param o The other object to compare for equality.
+         * @return true if the id of the wrapped node is the same.
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (o == null) {
+                return false;
+            }
+            if (this.getClass() != o.getClass()) {
+                return false;
+            }
+            SearchNode other = (SearchNode) o;
+            return this.node.equals(other.node);
+        }
+
+        @Override
+        public int hashCode() {
+            return this.node.hashCode();
+        }
+
+        double gFunc() {
+            return gFunc;
+        }
+
+        double hFunc() {
+            return hFunc;
+        }
+
+        double fFunc() {
+            return gFunc + hFunc;
         }
     }
 }

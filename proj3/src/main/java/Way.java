@@ -52,4 +52,8 @@ public class Way {
         }
         return nodes.add(node);
     }
+
+    boolean contains(Node node) {
+        return nodes.contains(node);
+    }
 }
