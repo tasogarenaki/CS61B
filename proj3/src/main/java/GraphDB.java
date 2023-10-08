@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +29,8 @@ public class GraphDB {
     private Map<Long, Node> nodes;
     private HashMap<Long, Location> locations;
     private HashMap<Long, Highway> highways;
+    private Trie cleanLocationNames;
+    private Map<String, List<Location>> locationsByCleanName;
 
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -47,6 +50,7 @@ public class GraphDB {
             SAXParser saxParser = factory.newSAXParser();
             GraphBuildingHandler gbh = new GraphBuildingHandler(this);
             saxParser.parse(inputStream, gbh);
+            initializeAutocompleteAndSearchData();
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
@@ -215,5 +219,82 @@ public class GraphDB {
 
     Highway getHighway(Long id) {
         return highways.get(id);
+    }
+
+
+    /** Autocomplete & Search */
+
+
+    /**
+     * Initializes data structures used for Autocomplete and Search.
+     * This method populates a Trie called cleanLocationNames and a Map called locationsByCleanName
+     * to enable efficient location retrieval by prefix and clean location name.
+     */
+    private void initializeAutocompleteAndSearchData() {
+        cleanLocationNames = new Trie();
+        locationsByCleanName = new HashMap<>();
+
+        for (Location location : locations.values()) {
+            if (location.containsAttributeKey("name")) {
+                String locationName = location.getAttributeValue("name");
+                String cleanLocationName = cleanString(locationName);
+                cleanLocationNames.addWord(cleanLocationName);
+
+                if (!locationsByCleanName.containsKey(cleanLocationName)) {
+                    locationsByCleanName.put(cleanLocationName, new ArrayList<>());
+                }
+                List<Location> locsByCleanName = locationsByCleanName.get(cleanLocationName);
+                locsByCleanName.add(location);
+            }
+        }
+    }
+
+    /**
+     * Retrieves a list of names of OSM locations whose names prefix-match the query string.
+     *
+     * @param prefix Prefix string to be searched for, which may vary in case and contain punctuation.
+     * @return A List of full location names whose cleaned names match the cleaned prefix.
+     */
+    List<String> getLocationsByPrefix(String prefix) {
+        prefix = prefix.toLowerCase();
+        List<String> cleanNames = cleanLocationNames.wordsByPrefix(prefix);
+        List<String> locationNames = new ArrayList<>();
+
+        for (String cleanName : cleanNames) {
+            List<Location> matchingLocations = locationsByCleanName.get(cleanName);
+            List<String> locationNamesSubset = matchingLocations.stream()
+                    .map(loc -> loc.getAttributeValue("name"))
+                    .collect(Collectors.toList());
+            locationNames.addAll(locationNamesSubset);
+        }
+        return locationNames;
+    }
+
+    /**
+     * Retrieves information about all locations that match a cleaned location name.
+     *
+     * @param locationName A full name of a location to search for.
+     * @return A list of locations, where each location is represented as a map of parameters for the JSON response.
+     * The map includes the following key-value pairs:
+     * "id": Number, The ID of the node.
+     * "lon": Number, The longitude of the node.
+     * "lat": Number, The latitude of the node.
+     * "name": String, The actual name of the node.
+     *
+     */
+    List<Map<String, Object>> getLocations(String locationName) {
+        locationName = cleanString(locationName);
+        List<Map<String, Object>> result = new ArrayList<>();
+        List<Location> matchingLocations = locationsByCleanName.get(locationName);
+
+        for (Location location : matchingLocations) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", location.id);
+            data.put("lon", location.node.lon);
+            data.put("lat", location.node.lat);
+            data.put("name", location.getAttributeValue("name"));
+            result.add(data);
+        }
+        return result;
     }
 }

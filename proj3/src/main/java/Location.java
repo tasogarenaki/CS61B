@@ -43,4 +43,11 @@ public class Location {
         return attributes.put(k, v);
     }
 
+    String getAttributeValue(String key) {
+        return attributes.get(key);
+    }
+
+    boolean containsAttributeKey(String key) {
+        return attributes.containsKey(key);
+    }
 }

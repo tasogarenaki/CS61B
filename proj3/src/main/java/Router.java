@@ -97,27 +97,30 @@ public class Router {
         if (route.size() <= 1) {
             return result;
         }
+
         NavigationDirection nd = new NavigationDirection();
         nd.direction = NavigationDirection.START;
         nd.distance = 0.0;
-        nd.way = NavigationDirection.getHighway(g, route.get(0), route.get(1));
+        nd.way = NavigationDirection.getHighwayName(g, route.get(0), route.get(1));
         boolean prevWayIsEmpty = nd.way.isEmpty(); // Track if the previous road name was empty
+
         for (int i = 1; i < route.size(); i++) {
             Long prev = route.get(i - 1);
             Long curr = route.get(i);
             nd.distance += g.distance(prev, curr);
             if (i == route.size() - 1) {
-                if (!prevWayIsEmpty) { // Check if the previous road name was not empty
+                if (!prevWayIsEmpty) {
                     result.add(nd);
                 }
                 break;
             }
+
             Long next = route.get(i + 1);
-            String nextWayName = NavigationDirection.getHighway(g, curr, next);
+            String nextWayName = NavigationDirection.getHighwayName(g, curr, next);
             if (nextWayName.isEmpty() || !nd.way.equals(nextWayName)) {
                 double prevBearing = g.bearing(route.get(i - 1), route.get(i));
                 double curBearing = g.bearing(route.get(i), route.get(i+1));
-                if (!prevWayIsEmpty) { // Check if the previous road name was not empty
+                if (!prevWayIsEmpty) {
                     result.add(nd);
                 }
                 prevWayIsEmpty = nextWayName.isEmpty(); // Update prevWayIsEmpty for the current road
@@ -129,13 +132,6 @@ public class Router {
         }
         return result;
     }
-
-
-
-
-
-
-
 
     /**
      * Class to represent a navigation direction, which consists of 3 attributes:
@@ -256,7 +252,13 @@ public class Router {
             return Objects.hash(direction, way, distance);
         }
 
-
+        /**
+         * Determines the navigation direction based on the difference between two bearings.
+         *
+         * @param b1 The initial bearing.
+         * @param b2 The final bearing.
+         * @return A navigation direction constant indicating the direction of the turn.
+         */
         private static int getDirection(double b1, double b2) {
             double shift = b2 - b1;
             if (shift > 180) {
@@ -281,7 +283,15 @@ public class Router {
             }
         }
 
-        private static String getHighway(GraphDB g, Long v1, Long v2) {
+        /**
+         * Retrieves the name of a highway that connects two nodes in a graph.
+         *
+         * @param g  The GraphDB instance representing the graph.
+         * @param v1 The ID of the first node.
+         * @param v2 The ID of the second node.
+         * @return The name of the highway connecting the two nodes, or an empty string if no such highway exists.
+         */
+        private static String getHighwayName(GraphDB g, Long v1, Long v2) {
             Iterable<Highway> highways = g.highways();
             Set<Highway> highwaysForV1 = new HashSet<>();
             Set<Highway> highwaysForV2 = new HashSet<>();
@@ -305,14 +315,13 @@ public class Router {
                 }
             }
 
-            // Handle the case where there are no intersecting highways
+            /* Handle the case where there are no intersecting highways. */
             if (intersection.isEmpty()) {
                 return ""; // Return an empty string
             }
 
             return intersection.iterator().next().name;
         }
-
     }
 
     /**
