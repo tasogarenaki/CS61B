@@ -53,6 +53,30 @@ public class Trie {
         return (FIRST_VALID_LETTER <= c && c <= LAST_VALID_LETTER) || c == SPACE_CHAR;
     }
 
+    public boolean contains(String word) {
+        CharNode node = sentinel;
+        for (int i = 0; i < word.length(); i++) {
+            Character character = word.charAt(i);
+            if (node.nextLetterMap == null || !node.nextLetterMap.containsKey(character)) {
+                return false;
+            }
+            node = node.nextLetterMap.get(character);
+        }
+        return node.end;
+    }
+
+    public boolean containsPrefix(String word) {
+        CharNode node = sentinel;
+        for (int i = 0; i < word.length(); i++) {
+            Character character = word.charAt(i);
+            if (node.nextLetterMap == null || !node.nextLetterMap.containsKey(character)) {
+                return false;
+            }
+            node = node.nextLetterMap.get(character);
+        }
+        return true;
+    }
+
     /**
      * Returns a list of all words that start with the given prefix.
      *

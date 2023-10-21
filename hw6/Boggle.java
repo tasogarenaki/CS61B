@@ -1,13 +1,14 @@
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Boggle {
-    
+
     // File path of dictionary file
     static String dictPath = "words.txt";
 
     /**
      * Solves a Boggle puzzle.
-     * 
+     *
      * @param k The maximum number of words to return.
      * @param boardFilePath The file path to Boggle board file.
      * @return a list of words found in given Boggle board.
@@ -16,8 +17,8 @@ public class Boggle {
      *         have them in ascending alphabetical order.
      */
     public static List<String> solve(int k, String boardFilePath) {
-        if (k <= 0) {
-            throw new IllegalArgumentException("k is non-positive");
+        if (k <= 0 || dictPath.isEmpty()) {
+            throw new IllegalArgumentException(k <= 0 ? "k is non-positive" : "The dictionary file does not exist.");
         }
 
         In dict = new In(dictPath);
@@ -35,13 +36,21 @@ public class Boggle {
             letters[i] = boardLines[i].toCharArray();
         }
 
+        Graph boggleGraph = Graph.create(letters, dictionary);
+        List<String> validWords = boggleGraph.findValidWords();
 
+        List<String> result = validWords.stream()
+                .distinct()
+                .sorted((s1, s2) -> s2.length() - s1.length())
+                .collect(Collectors.toList());
 
+        int length = result.size() > k ? k : result.size();
+        return result.subList(0, length);
+    }
 
-
-
-
-
-        return null;
+    public static void main(String[] args) {
+        String boardFilePath = "smallBoard.txt";
+        List<String> result = solve(7, boardFilePath);
+        System.out.println(result);
     }
 }
