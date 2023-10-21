@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 public class Boggle {
 
@@ -41,7 +42,8 @@ public class Boggle {
 
         List<String> result = validWords.stream()
                 .distinct()
-                .sorted((s1, s2) -> s2.length() - s1.length())
+                .sorted(Comparator.comparing(String::length).reversed()     // Sort by word length in descending order
+                        .thenComparing(String::compareTo))                  // Then, sort by lexicographical order
                 .collect(Collectors.toList());
 
         int length = result.size() > k ? k : result.size();
@@ -49,7 +51,7 @@ public class Boggle {
     }
 
     public static void main(String[] args) {
-        String boardFilePath = "smallBoard.txt";
+        String boardFilePath = "exampleBoard.txt";
         List<String> result = solve(7, boardFilePath);
         System.out.println(result);
     }
